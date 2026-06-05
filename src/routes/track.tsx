@@ -14,8 +14,8 @@ import {
 } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/track")({
-  component: TrackIssue;
-} as never);
+  component: TrackIssue,
+});
 
 function TrackIssue() {
   const [query, setQuery] = useState("CC-2026-0481");
