@@ -85,7 +85,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "CivicConnect is a smart citizen issue reporting platform. Report potholes, garbage, streetlights and more. Connecting Citizens. Solving Problems.",
       },
       { name: "author", content: "CivicConnect" },
-      { property: "og:title", content: "CivicConnect — Smart Citizen Issue Reporting" },
+      { property: "og:title", content: "CivicConnect — Report Civic Issues in Seconds" },
       {
         property: "og:description",
         content: "Help build a cleaner, safer, and smarter city. Report and track civic issues in seconds.",
@@ -93,6 +93,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@CivicConnect" },
+      { name: "twitter:title", content: "CivicConnect — Report Civic Issues in Seconds" },
+      { name: "description", content: "CivicConnect is a smart platform for citizens to report and track local civic issues." },
+      { property: "og:description", content: "CivicConnect is a smart platform for citizens to report and track local civic issues." },
+      { name: "twitter:description", content: "CivicConnect is a smart platform for citizens to report and track local civic issues." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8912a510-94b7-4426-a77b-7f8b878afcb5/id-preview-5334ddf7--83c1cb5f-edf2-4881-8b0c-2c4d99edb8fa.lovable.app-1780621831421.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8912a510-94b7-4426-a77b-7f8b878afcb5/id-preview-5334ddf7--83c1cb5f-edf2-4881-8b0c-2c4d99edb8fa.lovable.app-1780621831421.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
