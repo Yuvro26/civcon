@@ -1,0 +1,149 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { motion } from "framer-motion";
+import { Target, Eye, Rocket, Heart, Code2 } from "lucide-react";
+import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
+
+export const Route = createFileRoute("/about")({
+  head: () => ({
+    meta: [
+      { title: "About — CivicConnect" },
+      { name: "description", content: "Our mission, vision, and the team building CivicConnect." },
+      { property: "og:title", content: "About CivicConnect" },
+      { property: "og:description", content: "Connecting Citizens. Solving Problems." },
+    ],
+  }),
+  component: About,
+});
+
+const PILLARS = [
+  {
+    icon: Target,
+    title: "Mission",
+    desc: "Empower every citizen to report and resolve local civic issues effortlessly, building accountable cities.",
+  },
+  {
+    icon: Eye,
+    title: "Vision",
+    desc: "A future where every neighborhood is responsive, transparent, and continuously improving through data.",
+  },
+  {
+    icon: Rocket,
+    title: "Objectives",
+    desc: "Faster resolution, transparent tracking, civic engagement, and data-driven governance for all.",
+  },
+];
+
+const BENEFITS = [
+  "Faster issue resolution",
+  "Full transparency & tracking",
+  "Stronger community participation",
+  "Data-driven decision making",
+  "Accountable local authorities",
+  "Reward-based engagement",
+];
+
+const STACK = [
+  "React.js",
+  "TypeScript",
+  "Tailwind CSS",
+  "Framer Motion",
+  "Node.js",
+  "Express.js",
+  "MongoDB Atlas",
+  "JWT Auth",
+  "AWS S3 / SNS / Lambda",
+];
+
+const TEAM = [
+  { name: "Aarav Sharma", role: "Founder & Product" },
+  { name: "Priya Nair", role: "Engineering Lead" },
+  { name: "Rohan Mehta", role: "Design & UX" },
+  { name: "Sneha Kapoor", role: "Civic Partnerships" },
+];
+
+function About() {
+  return (
+    <SiteLayout>
+      <div className="py-8">
+        <PageHeader
+          eyebrow="About"
+          title="Building smarter, more responsive cities"
+          subtitle="CivicConnect bridges the gap between citizens and authorities with technology that makes civic action simple."
+        />
+
+        <div className="mx-auto mt-14 grid max-w-6xl gap-6 px-4 md:grid-cols-3">
+          {PILLARS.map((p, i) => (
+            <motion.div
+              key={p.title}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.08 }}
+              className="glass-card rounded-2xl p-6"
+            >
+              <div className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-primary text-primary-foreground shadow-glow">
+                <p.icon className="h-6 w-6" />
+              </div>
+              <h3 className="mt-5 text-lg font-semibold">{p.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{p.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="mx-auto mt-16 grid max-w-6xl gap-6 px-4 lg:grid-cols-2">
+          <div className="glass-card rounded-2xl p-6">
+            <div className="flex items-center gap-2">
+              <Heart className="h-5 w-5 text-destructive" />
+              <h3 className="text-lg font-semibold">Why CivicConnect?</h3>
+            </div>
+            <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+              {BENEFITS.map((b) => (
+                <li key={b} className="flex items-center gap-2 text-sm">
+                  <span className="h-1.5 w-1.5 rounded-full bg-gradient-primary" /> {b}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="glass-card rounded-2xl p-6">
+            <div className="flex items-center gap-2">
+              <Code2 className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold">Technology Stack</h3>
+            </div>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {STACK.map((t) => (
+                <span
+                  key={t}
+                  className="rounded-full border border-border bg-secondary/40 px-3 py-1.5 text-xs font-medium"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="mx-auto mt-16 max-w-6xl px-4">
+          <h3 className="text-center text-2xl font-bold">Meet the Team</h3>
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {TEAM.map((m, i) => (
+              <motion.div
+                key={m.name}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06 }}
+                className="glass-card rounded-2xl p-6 text-center"
+              >
+                <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-gradient-primary text-xl font-bold text-primary-foreground">
+                  {m.name.charAt(0)}
+                </div>
+                <h4 className="mt-4 font-semibold">{m.name}</h4>
+                <p className="text-xs text-muted-foreground">{m.role}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </SiteLayout>
+  );
+}
