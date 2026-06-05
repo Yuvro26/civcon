@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorksRouteImport } from './routes/works'
 import { Route as TrackRouteImport } from './routes/track'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReportRouteImport } from './routes/report'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
@@ -31,6 +32,11 @@ const WorksRoute = WorksRouteImport.update({
 const TrackRoute = TrackRouteImport.update({
   id: '/track',
   path: '/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReportRoute = ReportRouteImport.update({
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/report': typeof ReportRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
 }
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/report': typeof ReportRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
 }
@@ -132,6 +140,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/report': typeof ReportRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
 }
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/report'
+    | '/sitemap.xml'
     | '/track'
     | '/works'
   fileRoutesByTo: FileRoutesByTo
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/report'
+    | '/sitemap.xml'
     | '/track'
     | '/works'
   id:
@@ -179,6 +190,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/report'
+    | '/sitemap.xml'
     | '/track'
     | '/works'
   fileRoutesById: FileRoutesById
@@ -195,6 +207,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   ReportRoute: typeof ReportRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TrackRoute: typeof TrackRoute
   WorksRoute: typeof WorksRoute
 }
@@ -213,6 +226,13 @@ declare module '@tanstack/react-router' {
       path: '/track'
       fullPath: '/track'
       preLoaderRoute: typeof TrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/report': {
@@ -307,6 +327,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   ReportRoute: ReportRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TrackRoute: TrackRoute,
   WorksRoute: WorksRoute,
 }
