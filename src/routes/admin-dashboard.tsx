@@ -15,8 +15,6 @@ import {
 } from "lucide-react";
 import {
   ResponsiveContainer,
-  BarChart,
-  Bar,
   PieChart,
   Pie,
   Cell,
