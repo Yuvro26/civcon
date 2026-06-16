@@ -1,23 +1,23 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
-import { Navbar } from "@/components/site/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
+import { login } from "@/lib/auth";
 
 export const Route = createFileRoute("/login")({
   component: Login,
 });
 
 function Login() {
+  const navigate = useNavigate();
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
-      <Navbar />
       <div className="absolute inset-0 -z-10 bg-hero-glow opacity-60" />
-      <div className="mx-auto flex min-h-screen max-w-md items-center px-4 pt-24">
+      <div className="mx-auto flex min-h-screen max-w-md items-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -35,7 +35,9 @@ function Login() {
             className="mt-7 space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
-              toast.success("Demo login — backend coming soon!");
+              login();
+              toast.success("Logged in! Redirecting to dashboard.");
+              setTimeout(() => navigate({ to: "/dashboard" }), 600);
             }}
           >
             <div className="space-y-1.5">
