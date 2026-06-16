@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
+import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
+import { useAuth, logout } from "@/lib/auth";
 
 const NAV_LINKS = [
   { label: "Home", to: "/" },
+  { label: "Dashboard", to: "/dashboard" },
   { label: "Report", to: "/report" },
   { label: "Track", to: "/track" },
   { label: "Community", to: "/community" },
@@ -17,6 +20,15 @@ const NAV_LINKS = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const loggedIn = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    setOpen(false);
+    toast.success("Logged out successfully");
+    navigate({ to: "/login" });
+  };
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
