@@ -41,8 +41,8 @@ function Login() {
             onSubmit={(e) => {
               e.preventDefault();
               login();
-              toast.success("Logged in! Redirecting to dashboard.");
-              setTimeout(() => navigate({ to: "/dashboard" }), 600);
+              toast.success("Logged in! Redirecting…");
+              setTimeout(() => navigate({ to: destination }), 600);
             }}
           >
             <div className="space-y-1.5">
