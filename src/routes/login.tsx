@@ -9,11 +9,16 @@ import { Logo } from "@/components/Logo";
 import { login } from "@/lib/auth";
 
 export const Route = createFileRoute("/login")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+  }),
   component: Login,
 });
 
 function Login() {
   const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
+  const destination = redirect === "/report" ? "/report" : "/";
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       <div className="absolute inset-0 -z-10 bg-hero-glow opacity-60" />
