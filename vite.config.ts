@@ -12,4 +12,9 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Deploy target. Inside the Lovable sandbox / Publish this is automatically
+  // forced to Cloudflare, so Lovable Publish keeps working unchanged.
+  // Outside the sandbox (e.g. building on Vercel) Nitro uses the "vercel"
+  // preset and emits `.vercel/output`, which Vercel auto-detects and serves.
+  nitro: { preset: "vercel" },
 });
