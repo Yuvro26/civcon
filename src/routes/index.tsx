@@ -37,13 +37,23 @@ function hasSplashShown() {
 }
 
 function Home() {
-  // Splash only on the very first open of the website (per browser session).
-  const [booting, setBooting] = useState(() => !hasSplashShown());
+  // Start false so SSR and the first client render match (no hydration mismatch).
+  const [booting, setBooting] = useState(false);
+  const [ready, setReady] = useState(false);
   const loggedIn = useAuth();
   const navigate = useNavigate();
 
+  // Decide whether to show the splash, but only on the client after mount.
   useEffect(() => {
-    // Already past the initial splash → just redirect if not logged in.
+    if (!hasSplashShown()) {
+      setBooting(true);
+    }
+    setReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+
     if (!booting) {
       if (!loggedIn) navigate({ to: "/login" });
       return;
@@ -61,7 +71,7 @@ function Home() {
       }
     }, 2200);
     return () => clearTimeout(timer);
-  }, [booting, loggedIn, navigate]);
+  }, [ready, booting, loggedIn, navigate]);
 
   if (booting) {
     return <SplashScreen />;

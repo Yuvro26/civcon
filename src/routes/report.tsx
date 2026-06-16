@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Upload, Send, Image as ImageIcon, Crosshair } from "lucide-react";
 import { toast } from "sonner";
@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CATEGORIES, type IssuePriority } from "@/lib/demo-data";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/report")({
   component: ReportIssue,
@@ -26,6 +27,17 @@ const PRIORITIES: IssuePriority[] = ["Low", "Medium", "High"];
 function ReportIssue() {
   const [priority, setPriority] = useState<IssuePriority>("Medium");
   const [location, setLocation] = useState("");
+  const loggedIn = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loggedIn) {
+      navigate({ to: "/login", search: { redirect: "/report" } });
+    }
+  }, [loggedIn, navigate]);
+
+  if (!loggedIn) return null;
+
 
   return (
     <SiteLayout>
