@@ -331,7 +331,7 @@ function Landing() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button asChild variant="hero" size="xl">
-              <Link to="/register">
+              <Link to="/report">
                 Get Started Free <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
