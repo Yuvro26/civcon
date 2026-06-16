@@ -27,23 +27,48 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+function hasSplashShown() {
+  if (typeof window === "undefined") return true;
+  try {
+    return sessionStorage.getItem("cc_splash_shown") === "true";
+  } catch {
+    return true;
+  }
+}
+
 function Home() {
-  const [booting, setBooting] = useState(true);
+  // Splash only on the very first open of the website (per browser session).
+  const [booting, setBooting] = useState(() => !hasSplashShown());
   const loggedIn = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Already past the initial splash → just redirect if not logged in.
+    if (!booting) {
+      if (!loggedIn) navigate({ to: "/login" });
+      return;
+    }
+
     const timer = setTimeout(() => {
+      try {
+        sessionStorage.setItem("cc_splash_shown", "true");
+      } catch {
+        /* ignore */
+      }
       setBooting(false);
       if (!loggedIn) {
         navigate({ to: "/login" });
       }
     }, 2200);
     return () => clearTimeout(timer);
-  }, [loggedIn, navigate]);
+  }, [booting, loggedIn, navigate]);
 
-  if (booting || !loggedIn) {
+  if (booting) {
     return <SplashScreen />;
+  }
+
+  if (!loggedIn) {
+    return null;
   }
 
   return <Landing />;
