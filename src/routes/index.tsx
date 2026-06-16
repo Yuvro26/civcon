@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
-import { SplashScreen } from "@/components/SplashScreen";
+
 import { useAuth } from "@/lib/auth";
 import heroCity from "@/assets/hero-city.jpg";
 
