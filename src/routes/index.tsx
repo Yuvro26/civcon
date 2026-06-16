@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   MapPin,
   Camera,
@@ -30,14 +30,19 @@ export const Route = createFileRoute("/")({
 function Home() {
   const loggedIn = useAuth();
   const navigate = useNavigate();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!loggedIn) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !loggedIn) {
       navigate({ to: "/login" });
     }
-  }, [loggedIn, navigate]);
+  }, [mounted, loggedIn, navigate]);
 
-  if (!loggedIn) {
+  if (!mounted || !loggedIn) {
     return null;
   }
 
