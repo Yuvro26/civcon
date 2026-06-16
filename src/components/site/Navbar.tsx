@@ -70,7 +70,7 @@ export function Navbar() {
                   <Link to="/login">Login</Link>
                 </Button>
                 <Button asChild variant="hero" size="sm">
-                  <Link to="/register">Get Started</Link>
+                  <Link to="/report">Get Started</Link>
                 </Button>
               </>
             )}
