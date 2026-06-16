@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import {
   MapPin,
   Camera,
@@ -18,11 +19,36 @@ import {
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
+import { SplashScreen } from "@/components/SplashScreen";
+import { useAuth } from "@/lib/auth";
 import heroCity from "@/assets/hero-city.jpg";
 
 export const Route = createFileRoute("/")({
-  component: Landing,
+  component: Home,
 });
+
+function Home() {
+  const [booting, setBooting] = useState(true);
+  const loggedIn = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setBooting(false);
+      if (!loggedIn) {
+        navigate({ to: "/login" });
+      }
+    }, 2200);
+    return () => clearTimeout(timer);
+  }, [loggedIn, navigate]);
+
+  if (booting || !loggedIn) {
+    return <SplashScreen />;
+  }
+
+  return <Landing />;
+}
+
 
 const FEATURES = [
   { icon: MapPin, title: "GPS Location Detection", desc: "Auto-pinpoint the exact location of any issue with one tap." },
