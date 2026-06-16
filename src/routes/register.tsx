@@ -16,9 +16,8 @@ function Register() {
   const navigate = useNavigate();
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
-      <Navbar />
       <div className="absolute inset-0 -z-10 bg-hero-glow opacity-60" />
-      <div className="mx-auto flex min-h-screen max-w-md items-center px-4 pt-28 pb-12">
+      <div className="mx-auto flex min-h-screen max-w-md items-center px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -36,7 +35,8 @@ function Register() {
             className="mt-7 space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
-              toast.success("Account created (demo)! Redirecting to dashboard.");
+              login();
+              toast.success("Account created! Redirecting to dashboard.");
               setTimeout(() => navigate({ to: "/dashboard" }), 800);
             }}
           >
