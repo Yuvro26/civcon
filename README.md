@@ -98,14 +98,23 @@ npm install -g wrangler
 wrangler deploy
 ```
 
-### Option B — Vercel
+### Option B — Vercel (ready to deploy ✅)
+
+This repo is **pre-configured for Vercel**. The Nitro build target is set to
+the `vercel` preset (see `vite.config.ts`) and a `vercel.json` is included, so
+no manual setup is needed.
 
 1. Push your repo to GitHub.
 2. Import the repo at https://vercel.com/new.
-3. Vercel auto-detects the framework. Set:
+3. Vercel reads `vercel.json` automatically:
+   - **Framework Preset:** Other
    - **Build command:** `npm run build`
-   - **Output:** auto-detected
-4. Click **Deploy**.
+   - **Output:** auto-detected (`.vercel/output`)
+4. Click **Deploy**. That's it — SSR routes work out of the box.
+
+> The build emits `.vercel/output` (Vercel Build Output API), so do **not**
+> set a custom "Output Directory" in Vercel — leave it on auto-detect.
+
 
 ### Option C — Netlify
 
