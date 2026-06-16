@@ -7,11 +7,12 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { SplashScreen } from "@/components/SplashScreen";
 
 function NotFoundComponent() {
   return (
@@ -133,11 +134,42 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function SplashGate() {
+  // Show the splash only once, on the very first open of the web app
+  // (per browser session). Start false so SSR/first render match (no hydration mismatch).
+  const [booting, setBooting] = useState(false);
+
+  useEffect(() => {
+    let shown = true;
+    try {
+      shown = sessionStorage.getItem("cc_splash_shown") === "true";
+    } catch {
+      shown = true;
+    }
+    if (shown) return;
+
+    setBooting(true);
+    const timer = setTimeout(() => {
+      try {
+        sessionStorage.setItem("cc_splash_shown", "true");
+      } catch {
+        /* ignore */
+      }
+      setBooting(false);
+    }, 2200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!booting) return null;
+  return <SplashScreen />;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
+      <SplashGate />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster position="top-center" richColors />

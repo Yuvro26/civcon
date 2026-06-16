@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   MapPin,
   Camera,
@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
-import { SplashScreen } from "@/components/SplashScreen";
+
 import { useAuth } from "@/lib/auth";
 import heroCity from "@/assets/hero-city.jpg";
 
@@ -27,55 +27,15 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-function hasSplashShown() {
-  if (typeof window === "undefined") return true;
-  try {
-    return sessionStorage.getItem("cc_splash_shown") === "true";
-  } catch {
-    return true;
-  }
-}
-
 function Home() {
-  // Start false so SSR and the first client render match (no hydration mismatch).
-  const [booting, setBooting] = useState(false);
-  const [ready, setReady] = useState(false);
   const loggedIn = useAuth();
   const navigate = useNavigate();
 
-  // Decide whether to show the splash, but only on the client after mount.
   useEffect(() => {
-    if (!hasSplashShown()) {
-      setBooting(true);
+    if (!loggedIn) {
+      navigate({ to: "/login" });
     }
-    setReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!ready) return;
-
-    if (!booting) {
-      if (!loggedIn) navigate({ to: "/login" });
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      try {
-        sessionStorage.setItem("cc_splash_shown", "true");
-      } catch {
-        /* ignore */
-      }
-      setBooting(false);
-      if (!loggedIn) {
-        navigate({ to: "/login" });
-      }
-    }, 2200);
-    return () => clearTimeout(timer);
-  }, [ready, booting, loggedIn, navigate]);
-
-  if (booting) {
-    return <SplashScreen />;
-  }
+  }, [loggedIn, navigate]);
 
   if (!loggedIn) {
     return null;
@@ -83,6 +43,7 @@ function Home() {
 
   return <Landing />;
 }
+
 
 
 const FEATURES = [
