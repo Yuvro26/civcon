@@ -116,7 +116,7 @@ export function Navbar() {
                       </Link>
                     </Button>
                     <Button asChild variant="hero" size="sm" className="flex-1">
-                      <Link to="/register" onClick={() => setOpen(false)}>
+                      <Link to="/report" onClick={() => setOpen(false)}>
                         Get Started
                       </Link>
                     </Button>
