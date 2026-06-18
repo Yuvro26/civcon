@@ -111,11 +111,14 @@ function AdminDashboard() {
             </button>
           ))}
         </nav>
-        <Button asChild variant="ghost" className="justify-start text-muted-foreground">
-          <Link to="/">
-            <LogOut className="h-4 w-4" /> Sign out
-          </Link>
+        <Button
+          variant="ghost"
+          className="justify-start text-muted-foreground"
+          onClick={handleSignOut}
+        >
+          <LogOut className="h-4 w-4" /> Sign out
         </Button>
+
       </aside>
 
       {/* Main */}
