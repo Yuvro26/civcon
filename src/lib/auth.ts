@@ -2,6 +2,8 @@ import { useSyncExternalStore } from "react";
 
 const KEY = "cc_auth";
 const USERS_KEY = "cc_users";
+const ADMIN_KEY = "cc_admin_auth";
+const ADMIN_CREDS_KEY = "cc_admin_creds";
 const EVENT = "cc-auth-change";
 
 type StoredUser = {
