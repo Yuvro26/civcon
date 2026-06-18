@@ -1,5 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useAdminAuth, adminLogout } from "@/lib/auth";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard,
@@ -65,6 +67,26 @@ const PIE_COLORS = [
 
 function AdminDashboard() {
   const [active, setActive] = useState("Overview");
+  const navigate = useNavigate();
+  const isAdmin = useAdminAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isAdmin) {
+      navigate({ to: "/admin" });
+    }
+  }, [mounted, isAdmin, navigate]);
+
+  const handleSignOut = () => {
+    adminLogout();
+    toast.success("Signed out of admin");
+    navigate({ to: "/admin" });
+  };
+
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -89,11 +111,14 @@ function AdminDashboard() {
             </button>
           ))}
         </nav>
-        <Button asChild variant="ghost" className="justify-start text-muted-foreground">
-          <Link to="/">
-            <LogOut className="h-4 w-4" /> Sign out
-          </Link>
+        <Button
+          variant="ghost"
+          className="justify-start text-muted-foreground"
+          onClick={handleSignOut}
+        >
+          <LogOut className="h-4 w-4" /> Sign out
         </Button>
+
       </aside>
 
       {/* Main */}

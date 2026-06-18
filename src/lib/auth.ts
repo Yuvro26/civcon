@@ -2,6 +2,8 @@ import { useSyncExternalStore } from "react";
 
 const KEY = "cc_auth";
 const USERS_KEY = "cc_users";
+const ADMIN_KEY = "cc_admin_auth";
+const ADMIN_CREDS_KEY = "cc_admin_creds";
 const EVENT = "cc-auth-change";
 
 type StoredUser = {
@@ -165,3 +167,88 @@ function subscribe(callback: () => void) {
 export function useAuth(): boolean {
   return useSyncExternalStore(subscribe, isLoggedIn, () => false);
 }
+
+// ---- Admin auth ----
+type AdminCreds = { email: string; password: string };
+
+function readAdminCreds(): AdminCreds | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(ADMIN_CREDS_KEY);
+    return raw ? (JSON.parse(raw) as AdminCreds) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function adminExists(): boolean {
+  return readAdminCreds() !== null;
+}
+
+/**
+ * The first successful login becomes the admin and locks in the credentials.
+ * After that, only those exact credentials are accepted.
+ */
+export function adminLogin(input: { email: string; password: string }): AuthResult {
+  const emailErr = validateEmail(input.email);
+  if (emailErr) return { ok: false, error: emailErr };
+
+  const passErr = validatePassword(input.password);
+  if (passErr) return { ok: false, error: passErr };
+
+  const email = normalizeEmail(input.email);
+  const existing = readAdminCreds();
+
+  if (!existing) {
+    // First admin — register these credentials.
+    try {
+      localStorage.setItem(
+        ADMIN_CREDS_KEY,
+        JSON.stringify({ email, password: input.password }),
+      );
+    } catch {
+      /* ignore */
+    }
+    setAdminLoggedIn();
+    return { ok: true };
+  }
+
+  if (existing.email !== email || existing.password !== input.password) {
+    return { ok: false, error: "Invalid admin credentials." };
+  }
+
+  setAdminLoggedIn();
+  return { ok: true };
+}
+
+export function isAdminLoggedIn(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return localStorage.getItem(ADMIN_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function setAdminLoggedIn() {
+  try {
+    localStorage.setItem(ADMIN_KEY, "true");
+  } catch {
+    /* ignore */
+  }
+  emit();
+}
+
+export function adminLogout() {
+  try {
+    localStorage.removeItem(ADMIN_KEY);
+  } catch {
+    /* ignore */
+  }
+  emit();
+}
+
+export function useAdminAuth(): boolean {
+  return useSyncExternalStore(subscribe, isAdminLoggedIn, () => false);
+}
+
