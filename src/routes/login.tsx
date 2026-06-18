@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
-import { login } from "@/lib/auth";
+import { loginUser } from "@/lib/auth";
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -40,7 +40,14 @@ function Login() {
             className="mt-7 space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
-              login();
+              const form = e.currentTarget;
+              const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+              const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+              const result = loginUser({ email, password });
+              if (!result.ok) {
+                toast.error(result.error);
+                return;
+              }
               toast.success("Logged in! Redirecting…");
               setTimeout(() => navigate({ to: destination }), 600);
             }}
@@ -49,14 +56,14 @@ function Login() {
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input id="email" type="email" placeholder="you@email.com" className="pl-9" required />
+                <Input id="email" name="email" type="email" placeholder="you@email.com" className="pl-9" required />
               </div>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input id="password" type="password" placeholder="••••••••" className="pl-9" required />
+                <Input id="password" name="password" type="password" placeholder="••••••••" className="pl-9" required />
               </div>
             </div>
             <div className="flex justify-end">

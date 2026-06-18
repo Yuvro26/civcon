@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
-import { login } from "@/lib/auth";
+import { registerUser } from "@/lib/auth";
 
 export const Route = createFileRoute("/register")({
   component: Register,
@@ -35,14 +35,26 @@ function Register() {
             className="mt-7 space-y-4"
             onSubmit={(e) => {
               e.preventDefault();
-              login();
-              toast.success("Account created! Redirecting to dashboard.");
-              setTimeout(() => navigate({ to: "/dashboard" }), 800);
+              const form = e.currentTarget;
+              const get = (n: string) => (form.elements.namedItem(n) as HTMLInputElement).value;
+              const result = registerUser({
+                name: get("name"),
+                email: get("email"),
+                mobile: get("mobile"),
+                password: get("password"),
+                confirm: get("confirm"),
+              });
+              if (!result.ok) {
+                toast.error(result.error);
+                return;
+              }
+              toast.success("Account created! Please login to continue.");
+              setTimeout(() => navigate({ to: "/login" }), 800);
             }}
           >
             <Field id="name" label="Full Name" icon={User} placeholder="Your name" />
             <Field id="email" label="Email" icon={Mail} type="email" placeholder="you@email.com" />
-            <Field id="mobile" label="Mobile Number" icon={Phone} placeholder="+91 98765 43210" />
+            <Field id="mobile" label="Mobile Number" icon={Phone} type="tel" placeholder="9876543210" />
             <Field id="password" label="Password" icon={Lock} type="password" placeholder="••••••••" />
             <Field
               id="confirm"
