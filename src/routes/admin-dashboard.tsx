@@ -67,6 +67,26 @@ const PIE_COLORS = [
 
 function AdminDashboard() {
   const [active, setActive] = useState("Overview");
+  const navigate = useNavigate();
+  const isAdmin = useAdminAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isAdmin) {
+      navigate({ to: "/admin" });
+    }
+  }, [mounted, isAdmin, navigate]);
+
+  const handleSignOut = () => {
+    adminLogout();
+    toast.success("Signed out of admin");
+    navigate({ to: "/admin" });
+  };
+
 
   return (
     <div className="flex min-h-screen bg-background">
