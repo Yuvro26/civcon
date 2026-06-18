@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Mail, Lock, ShieldCheck, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
@@ -7,12 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
+import { adminLogin, adminExists } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin")({
   component: AdminAuth,
 });
 
 function AdminAuth() {
+  const navigate = useNavigate();
+  const hasAdmin = typeof window !== "undefined" && adminExists();
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       <Navbar />
