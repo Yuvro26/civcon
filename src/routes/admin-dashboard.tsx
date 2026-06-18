@@ -1,5 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useAdminAuth, adminLogout } from "@/lib/auth";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard,
