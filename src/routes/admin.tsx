@@ -1,4 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Lock, ShieldCheck, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
@@ -6,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
-import { adminLogin, adminExists } from "@/lib/auth";
+import { adminLogin, adminExists } from "@/lib/auth.functions";
+import { setAdminLoggedIn } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin")({
   component: AdminAuth,
@@ -14,7 +17,16 @@ export const Route = createFileRoute("/admin")({
 
 function AdminAuth() {
   const navigate = useNavigate();
-  const hasAdmin = typeof window !== "undefined" && adminExists();
+  const doAdminLogin = useServerFn(adminLogin);
+  const checkAdminExists = useServerFn(adminExists);
+  const [hasAdmin, setHasAdmin] = useState(false);
+
+  useEffect(() => {
+    checkAdminExists()
+      .then((r) => setHasAdmin(r.exists))
+      .catch(() => setHasAdmin(false));
+  }, [checkAdminExists]);
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       <div className="absolute inset-0 -z-10 bg-hero-glow opacity-60" />
@@ -39,18 +51,23 @@ function AdminAuth() {
 
           <form
             className="mt-7 space-y-4"
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
               const form = e.currentTarget;
               const email = (form.elements.namedItem("email") as HTMLInputElement).value;
               const password = (form.elements.namedItem("password") as HTMLInputElement).value;
-              const result = adminLogin({ email, password });
-              if (!result.ok) {
-                toast.error(result.error);
-                return;
+              try {
+                const result = await doAdminLogin({ data: { email, password } });
+                if (!result.ok) {
+                  toast.error(result.error);
+                  return;
+                }
+                setAdminLoggedIn();
+                toast.success("Admin login successful! Redirecting…");
+                setTimeout(() => navigate({ to: "/admin-dashboard" }), 600);
+              } catch {
+                toast.error("Something went wrong. Please try again.");
               }
-              toast.success("Admin login successful! Redirecting…");
-              setTimeout(() => navigate({ to: "/admin-dashboard" }), 600);
             }}
           >
             <div className="space-y-1.5">

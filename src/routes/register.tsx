@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
 import { User, Mail, Phone, Lock, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
-import { registerUser } from "@/lib/auth";
+import { registerUser } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/register")({
   component: Register,
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/register")({
 
 function Register() {
   const navigate = useNavigate();
+  const register = useServerFn(registerUser);
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       <div className="absolute inset-0 -z-10 bg-hero-glow opacity-60" />
@@ -33,23 +35,29 @@ function Register() {
 
           <form
             className="mt-7 space-y-4"
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
               const form = e.currentTarget;
               const get = (n: string) => (form.elements.namedItem(n) as HTMLInputElement).value;
-              const result = registerUser({
-                name: get("name"),
-                email: get("email"),
-                mobile: get("mobile"),
-                password: get("password"),
-                confirm: get("confirm"),
-              });
-              if (!result.ok) {
-                toast.error(result.error);
-                return;
+              try {
+                const result = await register({
+                  data: {
+                    name: get("name"),
+                    email: get("email"),
+                    mobile: get("mobile"),
+                    password: get("password"),
+                    confirm: get("confirm"),
+                  },
+                });
+                if (!result.ok) {
+                  toast.error(result.error);
+                  return;
+                }
+                toast.success("Account created! Please login to continue.");
+                setTimeout(() => navigate({ to: "/login" }), 800);
+              } catch {
+                toast.error("Something went wrong. Please try again.");
               }
-              toast.success("Account created! Please login to continue.");
-              setTimeout(() => navigate({ to: "/login" }), 800);
             }}
           >
             <Field id="name" label="Full Name" icon={User} placeholder="Your name" />
