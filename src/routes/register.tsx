@@ -15,6 +15,7 @@ export const Route = createFileRoute("/register")({
 
 function Register() {
   const navigate = useNavigate();
+  const register = useServerFn(registerUser);
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       <div className="absolute inset-0 -z-10 bg-hero-glow opacity-60" />
