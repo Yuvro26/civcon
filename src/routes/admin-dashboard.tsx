@@ -68,24 +68,22 @@ const PIE_COLORS = [
 function AdminDashboard() {
   const [active, setActive] = useState("Overview");
   const navigate = useNavigate();
-  const isAdmin = useAdminAuth();
-  const [mounted, setMounted] = useState(false);
+  const { isAdmin, loading } = useAdminAuth();
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (mounted && !isAdmin) {
+    if (!loading && !isAdmin) {
       navigate({ to: "/admin" });
     }
-  }, [mounted, isAdmin, navigate]);
+  }, [loading, isAdmin, navigate]);
 
-  const handleSignOut = () => {
-    adminLogout();
+  const handleSignOut = async () => {
+    await adminLogout();
     toast.success("Signed out of admin");
     navigate({ to: "/admin" });
   };
+
+  if (loading || !isAdmin) return null;
+
 
 
   return (
