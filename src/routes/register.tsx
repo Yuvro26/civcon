@@ -1,5 +1,4 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
 import { User, Mail, Phone, Lock, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
@@ -7,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
-import { registerUser } from "@/lib/auth.functions";
+import { supabase } from "@/integrations/supabase/client";
+import { validateEmail, validatePassword, validateMobile } from "@/lib/auth";
 
 export const Route = createFileRoute("/register")({
   component: Register,
