@@ -20,11 +20,11 @@ const NAV_LINKS = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const loggedIn = useAuth();
+  const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setOpen(false);
     toast.success("Logged out successfully");
     navigate({ to: "/login" });
