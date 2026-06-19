@@ -53,7 +53,7 @@ function AdminAuth() {
         return;
       }
 
-      const { admin } = await doEnsureAdmin({ data: {} });
+      const { admin } = await doEnsureAdmin();
       if (!admin) {
         await supabase.auth.signOut();
         toast.error("You are not authorized as an administrator.");
