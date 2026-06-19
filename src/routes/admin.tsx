@@ -97,18 +97,7 @@ function AdminAuth() {
               const form = e.currentTarget;
               const email = (form.elements.namedItem("email") as HTMLInputElement).value;
               const password = (form.elements.namedItem("password") as HTMLInputElement).value;
-              try {
-                const result = await doAdminLogin({ data: { email, password } });
-                if (!result.ok) {
-                  toast.error(result.error);
-                  return;
-                }
-                setAdminLoggedIn();
-                toast.success("Admin login successful! Redirecting…");
-                setTimeout(() => navigate({ to: "/admin-dashboard" }), 600);
-              } catch {
-                toast.error("Something went wrong. Please try again.");
-              }
+              await handleAdmin(email, password);
             }}
           >
             <div className="space-y-1.5">
