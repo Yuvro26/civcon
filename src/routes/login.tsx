@@ -44,13 +44,21 @@ function Login() {
               const form = e.currentTarget;
               const email = (form.elements.namedItem("email") as HTMLInputElement).value;
               const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+              const emailErr = validateEmail(email);
+              if (emailErr) {
+                toast.error(emailErr);
+                return;
+              }
+              if (!password) {
+                toast.error("Password is required.");
+                return;
+              }
               try {
-                const result = await login({ data: { email, password } });
-                if (!result.ok) {
-                  toast.error(result.error);
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) {
+                  toast.error("Invalid email or password.");
                   return;
                 }
-                setLoggedIn();
                 toast.success("Logged in! Redirecting…");
                 setTimeout(() => navigate({ to: destination }), 600);
               } catch {
