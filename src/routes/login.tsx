@@ -1,5 +1,4 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
@@ -7,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
-import { loginUser } from "@/lib/auth.functions";
-import { setLoggedIn } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { validateEmail } from "@/lib/auth";
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -21,7 +20,6 @@ function Login() {
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
   const destination = redirect === "/report" ? "/report" : "/";
-  const login = useServerFn(loginUser);
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       <div className="absolute inset-0 -z-10 bg-hero-glow opacity-60" />
@@ -46,13 +44,21 @@ function Login() {
               const form = e.currentTarget;
               const email = (form.elements.namedItem("email") as HTMLInputElement).value;
               const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+              const emailErr = validateEmail(email);
+              if (emailErr) {
+                toast.error(emailErr);
+                return;
+              }
+              if (!password) {
+                toast.error("Password is required.");
+                return;
+              }
               try {
-                const result = await login({ data: { email, password } });
-                if (!result.ok) {
-                  toast.error(result.error);
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) {
+                  toast.error("Invalid email or password.");
                   return;
                 }
-                setLoggedIn();
                 toast.success("Logged in! Redirecting…");
                 setTimeout(() => navigate({ to: destination }), 600);
               } catch {

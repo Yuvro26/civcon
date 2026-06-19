@@ -20,11 +20,11 @@ const NAV_LINKS = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const loggedIn = useAuth();
+  const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setOpen(false);
     toast.success("Logged out successfully");
     navigate({ to: "/login" });
@@ -60,7 +60,7 @@ export function Navbar() {
           </div>
 
           <div className="hidden items-center gap-2 md:flex">
-            {loggedIn ? (
+            {isLoggedIn ? (
               <Button variant="ghost" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4" /> Logout
               </Button>
@@ -104,7 +104,7 @@ export function Navbar() {
                 </Link>
               ))}
               <div className="mt-2 flex gap-2">
-                {loggedIn ? (
+                {isLoggedIn ? (
                   <Button variant="ghost" size="sm" className="flex-1" onClick={handleLogout}>
                     <LogOut className="h-4 w-4" /> Logout
                   </Button>

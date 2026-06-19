@@ -1,8 +1,5 @@
-import { useSyncExternalStore } from "react";
-
-const KEY = "cc_auth";
-const ADMIN_KEY = "cc_admin_auth";
-const EVENT = "cc-auth-change";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 // Re-export validation helpers so existing imports keep working.
 export {
@@ -12,83 +9,77 @@ export {
   type AuthResult,
 } from "./validation";
 
-function emit() {
-  window.dispatchEvent(new Event(EVENT));
-}
-
 // ---- User session ----
-export function isLoggedIn(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    return localStorage.getItem(KEY) === "true";
-  } catch {
-    return false;
-  }
+export function useAuth(): { isLoggedIn: boolean; loading: boolean } {
+  const [state, setState] = useState<{ isLoggedIn: boolean; loading: boolean }>({
+    isLoggedIn: false,
+    loading: true,
+  });
+
+  useEffect(() => {
+    let active = true;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (active) setState({ isLoggedIn: !!data.session, loading: false });
+    });
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (active) setState({ isLoggedIn: !!session, loading: false });
+    });
+
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  return state;
 }
 
-export function setLoggedIn() {
-  try {
-    localStorage.setItem(KEY, "true");
-  } catch {
-    /* ignore */
-  }
-  emit();
-}
-
-export function login() {
-  setLoggedIn();
-}
-
-export function logout() {
-  try {
-    localStorage.removeItem(KEY);
-  } catch {
-    /* ignore */
-  }
-  emit();
-}
-
-function subscribe(callback: () => void) {
-  window.addEventListener(EVENT, callback);
-  window.addEventListener("storage", callback);
-  return () => {
-    window.removeEventListener(EVENT, callback);
-    window.removeEventListener("storage", callback);
-  };
-}
-
-export function useAuth(): boolean {
-  return useSyncExternalStore(subscribe, isLoggedIn, () => false);
+export async function logout() {
+  await supabase.auth.signOut();
 }
 
 // ---- Admin session ----
-export function isAdminLoggedIn(): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    return localStorage.getItem(ADMIN_KEY) === "true";
-  } catch {
-    return false;
-  }
+export function useAdminAuth(): { isAdmin: boolean; loading: boolean } {
+  const [state, setState] = useState<{ isAdmin: boolean; loading: boolean }>({
+    isAdmin: false,
+    loading: true,
+  });
+
+  useEffect(() => {
+    let active = true;
+
+    async function check() {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData.session;
+      if (!session) {
+        if (active) setState({ isAdmin: false, loading: false });
+        return;
+      }
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (active) setState({ isAdmin: !!data, loading: false });
+    }
+
+    check();
+
+    const { data: sub } = supabase.auth.onAuthStateChange(() => check());
+
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  return state;
 }
 
-export function setAdminLoggedIn() {
-  try {
-    localStorage.setItem(ADMIN_KEY, "true");
-  } catch {
-    /* ignore */
-  }
-  emit();
-}
-
-export function adminLogout() {
-  try {
-    localStorage.removeItem(ADMIN_KEY);
-  } catch {
-    /* ignore */
-  }
-  emit();
-}
-
-export function useAdminAuth(): boolean {
-  return useSyncExternalStore(subscribe, isAdminLoggedIn, () => false);
+// Admin sign-out is the same as a normal sign-out (clears the session).
+export async function adminLogout() {
+  await supabase.auth.signOut();
 }
