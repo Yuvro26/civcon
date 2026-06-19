@@ -27,21 +27,16 @@ const PRIORITIES: IssuePriority[] = ["Low", "Medium", "High"];
 function ReportIssue() {
   const [priority, setPriority] = useState<IssuePriority>("Medium");
   const [location, setLocation] = useState("");
-  const [mounted, setMounted] = useState(false);
-  const loggedIn = useAuth();
+  const { isLoggedIn, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (mounted && !loggedIn) {
+    if (!loading && !isLoggedIn) {
       navigate({ to: "/login", search: { redirect: "/report" } });
     }
-  }, [mounted, loggedIn, navigate]);
+  }, [loading, isLoggedIn, navigate]);
 
-  if (!mounted || !loggedIn) return null;
+  if (loading || !isLoggedIn) return null;
 
 
 
