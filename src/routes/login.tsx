@@ -41,18 +41,23 @@ function Login() {
 
           <form
             className="mt-7 space-y-4"
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
               const form = e.currentTarget;
               const email = (form.elements.namedItem("email") as HTMLInputElement).value;
               const password = (form.elements.namedItem("password") as HTMLInputElement).value;
-              const result = loginUser({ email, password });
-              if (!result.ok) {
-                toast.error(result.error);
-                return;
+              try {
+                const result = await login({ data: { email, password } });
+                if (!result.ok) {
+                  toast.error(result.error);
+                  return;
+                }
+                setLoggedIn();
+                toast.success("Logged in! Redirecting…");
+                setTimeout(() => navigate({ to: destination }), 600);
+              } catch {
+                toast.error("Something went wrong. Please try again.");
               }
-              toast.success("Logged in! Redirecting…");
-              setTimeout(() => navigate({ to: destination }), 600);
             }}
           >
             <div className="space-y-1.5">
