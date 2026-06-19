@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
-import { adminLogin, adminExists } from "@/lib/auth.functions";
-import { setAdminLoggedIn } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { validateEmail, validatePassword } from "@/lib/auth";
+import { ensureAdmin, checkAdminExists } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/admin")({
   component: AdminAuth,
@@ -17,15 +18,55 @@ export const Route = createFileRoute("/admin")({
 
 function AdminAuth() {
   const navigate = useNavigate();
-  const doAdminLogin = useServerFn(adminLogin);
-  const checkAdminExists = useServerFn(adminExists);
+  const doEnsureAdmin = useServerFn(ensureAdmin);
+  const doCheckAdminExists = useServerFn(checkAdminExists);
   const [hasAdmin, setHasAdmin] = useState(false);
 
   useEffect(() => {
-    checkAdminExists()
+    doCheckAdminExists()
       .then((r) => setHasAdmin(r.exists))
       .catch(() => setHasAdmin(false));
-  }, [checkAdminExists]);
+  }, [doCheckAdminExists]);
+
+  async function handleAdmin(email: string, password: string) {
+    const emailErr = validateEmail(email);
+    if (emailErr) return toast.error(emailErr);
+    const passErr = validatePassword(password);
+    if (passErr) return toast.error(passErr);
+
+    try {
+      // Try to sign in with the existing account.
+      let signInError = (await supabase.auth.signInWithPassword({ email, password })).error;
+
+      // If sign-in fails and no admin exists yet, create the first admin account.
+      if (signInError && !hasAdmin) {
+        const { error: signUpError } = await supabase.auth.signUp({ email, password });
+        if (signUpError && !/already|registered|exists/i.test(signUpError.message)) {
+          toast.error(signUpError.message);
+          return;
+        }
+        signInError = (await supabase.auth.signInWithPassword({ email, password })).error;
+      }
+
+      if (signInError) {
+        toast.error("Invalid admin credentials.");
+        return;
+      }
+
+      const { admin } = await doEnsureAdmin({ data: {} });
+      if (!admin) {
+        await supabase.auth.signOut();
+        toast.error("You are not authorized as an administrator.");
+        return;
+      }
+
+      toast.success("Admin login successful! Redirecting…");
+      setTimeout(() => navigate({ to: "/admin-dashboard" }), 600);
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    }
+  }
+
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
