@@ -35,23 +35,29 @@ function Register() {
 
           <form
             className="mt-7 space-y-4"
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
               const form = e.currentTarget;
               const get = (n: string) => (form.elements.namedItem(n) as HTMLInputElement).value;
-              const result = registerUser({
-                name: get("name"),
-                email: get("email"),
-                mobile: get("mobile"),
-                password: get("password"),
-                confirm: get("confirm"),
-              });
-              if (!result.ok) {
-                toast.error(result.error);
-                return;
+              try {
+                const result = await register({
+                  data: {
+                    name: get("name"),
+                    email: get("email"),
+                    mobile: get("mobile"),
+                    password: get("password"),
+                    confirm: get("confirm"),
+                  },
+                });
+                if (!result.ok) {
+                  toast.error(result.error);
+                  return;
+                }
+                toast.success("Account created! Please login to continue.");
+                setTimeout(() => navigate({ to: "/login" }), 800);
+              } catch {
+                toast.error("Something went wrong. Please try again.");
               }
-              toast.success("Account created! Please login to continue.");
-              setTimeout(() => navigate({ to: "/login" }), 800);
             }}
           >
             <Field id="name" label="Full Name" icon={User} placeholder="Your name" />
