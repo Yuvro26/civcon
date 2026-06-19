@@ -51,18 +51,23 @@ function AdminAuth() {
 
           <form
             className="mt-7 space-y-4"
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
               const form = e.currentTarget;
               const email = (form.elements.namedItem("email") as HTMLInputElement).value;
               const password = (form.elements.namedItem("password") as HTMLInputElement).value;
-              const result = adminLogin({ email, password });
-              if (!result.ok) {
-                toast.error(result.error);
-                return;
+              try {
+                const result = await doAdminLogin({ data: { email, password } });
+                if (!result.ok) {
+                  toast.error(result.error);
+                  return;
+                }
+                setAdminLoggedIn();
+                toast.success("Admin login successful! Redirecting…");
+                setTimeout(() => navigate({ to: "/admin-dashboard" }), 600);
+              } catch {
+                toast.error("Something went wrong. Please try again.");
               }
-              toast.success("Admin login successful! Redirecting…");
-              setTimeout(() => navigate({ to: "/admin-dashboard" }), 600);
             }}
           >
             <div className="space-y-1.5">
