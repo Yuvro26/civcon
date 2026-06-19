@@ -17,9 +17,8 @@ function AdminAuth() {
   const hasAdmin = typeof window !== "undefined" && adminExists();
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
-      <Navbar />
       <div className="absolute inset-0 -z-10 bg-hero-glow opacity-60" />
-      <div className="mx-auto flex min-h-screen max-w-md items-center px-4 pt-24">
+      <div className="mx-auto flex min-h-screen max-w-md items-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
