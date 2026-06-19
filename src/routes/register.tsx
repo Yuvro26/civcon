@@ -38,18 +38,39 @@ function Register() {
               e.preventDefault();
               const form = e.currentTarget;
               const get = (n: string) => (form.elements.namedItem(n) as HTMLInputElement).value;
+              const name = get("name").trim();
+              const email = get("email").trim();
+              const mobile = get("mobile");
+              const password = get("password");
+              const confirm = get("confirm");
+
+              const emailErr = validateEmail(email);
+              if (emailErr) return toast.error(emailErr);
+              const mobileErr = validateMobile(mobile);
+              if (mobileErr) return toast.error(mobileErr);
+              const passErr = validatePassword(password);
+              if (passErr) return toast.error(passErr);
+              if (password !== confirm) return toast.error("Passwords do not match.");
+
               try {
-                const result = await register({
-                  data: {
-                    name: get("name"),
-                    email: get("email"),
-                    mobile: get("mobile"),
-                    password: get("password"),
-                    confirm: get("confirm"),
+                const { data, error } = await supabase.auth.signUp({
+                  email,
+                  password,
+                  options: {
+                    emailRedirectTo: `${window.location.origin}/login`,
+                    data: { name, mobile: mobile.replace(/\D/g, "") },
                   },
                 });
-                if (!result.ok) {
-                  toast.error(result.error);
+                if (error) {
+                  toast.error(
+                    /already|registered|exists/i.test(error.message)
+                      ? "An account with this email already exists. Please login."
+                      : error.message,
+                  );
+                  return;
+                }
+                if (data.user && data.user.identities && data.user.identities.length === 0) {
+                  toast.error("An account with this email already exists. Please login.");
                   return;
                 }
                 toast.success("Account created! Please login to continue.");
