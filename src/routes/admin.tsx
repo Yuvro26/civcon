@@ -1,4 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Lock, ShieldCheck, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
@@ -6,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
-import { adminLogin, adminExists } from "@/lib/auth";
+import { adminLogin, adminExists } from "@/lib/auth.functions";
+import { setAdminLoggedIn } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin")({
   component: AdminAuth,
@@ -14,7 +17,16 @@ export const Route = createFileRoute("/admin")({
 
 function AdminAuth() {
   const navigate = useNavigate();
-  const hasAdmin = typeof window !== "undefined" && adminExists();
+  const doAdminLogin = useServerFn(adminLogin);
+  const checkAdminExists = useServerFn(adminExists);
+  const [hasAdmin, setHasAdmin] = useState(false);
+
+  useEffect(() => {
+    checkAdminExists()
+      .then((r) => setHasAdmin(r.exists))
+      .catch(() => setHasAdmin(false));
+  }, [checkAdminExists]);
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       <div className="absolute inset-0 -z-10 bg-hero-glow opacity-60" />
