@@ -28,21 +28,16 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const loggedIn = useAuth();
+  const { isLoggedIn, loading } = useAuth();
   const navigate = useNavigate();
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (mounted && !loggedIn) {
+    if (!loading && !isLoggedIn) {
       navigate({ to: "/login" });
     }
-  }, [mounted, loggedIn, navigate]);
+  }, [loading, isLoggedIn, navigate]);
 
-  if (!mounted || !loggedIn) {
+  if (loading || !isLoggedIn) {
     return null;
   }
 
