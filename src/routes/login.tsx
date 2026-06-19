@@ -21,6 +21,7 @@ function Login() {
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
   const destination = redirect === "/report" ? "/report" : "/";
+  const login = useServerFn(loginUser);
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       <div className="absolute inset-0 -z-10 bg-hero-glow opacity-60" />
