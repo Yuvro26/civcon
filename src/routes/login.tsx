@@ -1,5 +1,4 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
@@ -7,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
-import { loginUser } from "@/lib/auth.functions";
-import { setLoggedIn } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { validateEmail } from "@/lib/auth";
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -21,7 +20,6 @@ function Login() {
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
   const destination = redirect === "/report" ? "/report" : "/";
-  const login = useServerFn(loginUser);
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       <div className="absolute inset-0 -z-10 bg-hero-glow opacity-60" />
