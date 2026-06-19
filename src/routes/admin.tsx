@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Mail, Lock, ShieldCheck, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
-import { Navbar } from "@/components/site/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,9 +17,8 @@ function AdminAuth() {
   const hasAdmin = typeof window !== "undefined" && adminExists();
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
-      <Navbar />
       <div className="absolute inset-0 -z-10 bg-hero-glow opacity-60" />
-      <div className="mx-auto flex min-h-screen max-w-md items-center px-4 pt-24">
+      <div className="mx-auto flex min-h-screen max-w-md items-center px-4">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
