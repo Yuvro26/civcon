@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Upload, Send, Image as ImageIcon, Crosshair } from "lucide-react";
+import { MapPin, Upload, Send, Crosshair, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,12 @@ import {
 } from "@/components/ui/select";
 import { CATEGORIES, type IssuePriority } from "@/lib/demo-data";
 import { useAuth } from "@/lib/auth";
+import {
+  createIssue,
+  uploadIssueImage,
+  removeIssueImage,
+  validateImageFile,
+} from "@/lib/issues";
 
 export const Route = createFileRoute("/report")({
   component: ReportIssue,
@@ -26,7 +32,18 @@ const PRIORITIES: IssuePriority[] = ["Low", "Medium", "High"];
 
 function ReportIssue() {
   const [priority, setPriority] = useState<IssuePriority>("Medium");
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [dragActive, setDragActive] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const { isLoggedIn, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -36,9 +53,99 @@ function ReportIssue() {
     }
   }, [loading, isLoggedIn, navigate]);
 
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
   if (loading || !isLoggedIn) return null;
 
+  const handleFile = (selected: File | null) => {
+    if (!selected) return;
+    const err = validateImageFile(selected);
+    if (err) {
+      toast.error(err);
+      return;
+    }
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setFile(selected);
+    setPreviewUrl(URL.createObjectURL(selected));
+  };
 
+  const clearImage = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setFile(null);
+    setPreviewUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const detectLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported on this device.");
+      return;
+    }
+    toast.loading("Detecting your location…", { id: "geo" });
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setLocation(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+        toast.success("Location detected.", { id: "geo" });
+      },
+      () => toast.error("Could not detect location. Please enter it manually.", { id: "geo" }),
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) return toast.error("Please enter an issue title.");
+    if (!category) return toast.error("Please select a category.");
+    if (!description.trim()) return toast.error("Please add a description.");
+
+    setSubmitting(true);
+    let imagePath: string | null = null;
+    try {
+      if (file) {
+        setUploading(true);
+        try {
+          imagePath = await uploadIssueImage(file);
+        } catch {
+          toast.error("Image upload failed. Please try again.");
+          setUploading(false);
+          setSubmitting(false);
+          return;
+        }
+        setUploading(false);
+      }
+
+      const issue = await createIssue(
+        { title, category, priority, description, location },
+        imagePath,
+      );
+
+      toast.success(`Complaint submitted! Your ID is ${issue.ticket_id}.`);
+      // reset form
+      setTitle("");
+      setCategory("");
+      setPriority("Medium");
+      setDescription("");
+      setLocation("");
+      clearImage();
+      navigate({ to: "/track", search: { id: issue.ticket_id } });
+    } catch (err) {
+      // roll back uploaded image if the DB insert failed
+      if (imagePath) await removeIssueImage(imagePath).catch(() => {});
+      toast.error(
+        err instanceof Error ? err.message : "Something went wrong. Please try again.",
+      );
+    } finally {
+      setUploading(false);
+      setSubmitting(false);
+    }
+  };
+
+  const busy = submitting || uploading;
 
   return (
     <SiteLayout>
@@ -52,21 +159,24 @@ function ReportIssue() {
         <motion.form
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          onSubmit={(e) => {
-            e.preventDefault();
-            toast.success("Complaint submitted! Your ID is CC-2026-0482 (demo).");
-          }}
+          onSubmit={handleSubmit}
           className="glass-card mx-auto mt-12 max-w-3xl space-y-6 rounded-3xl p-6 sm:p-8"
         >
           <div className="space-y-1.5">
             <Label htmlFor="title">Issue Title</Label>
-            <Input id="title" placeholder="e.g. Large pothole near Market Junction" required />
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Large pothole near Market Junction"
+              required
+            />
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Category</Label>
-              <Select required>
+              <Select value={category} onValueChange={setCategory} required>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
@@ -106,6 +216,8 @@ function ReportIssue() {
             <Textarea
               id="desc"
               rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe the issue, when you noticed it, and how it affects the area."
               required
             />
@@ -123,48 +235,80 @@ function ReportIssue() {
                   className="pl-9"
                 />
               </div>
-              <Button
-                type="button"
-                variant="glass"
-                onClick={() => {
-                  setLocation("MG Road, Sector 14 (auto-detected)");
-                  toast.success("Location detected via GPS (demo).");
-                }}
-              >
+              <Button type="button" variant="glass" onClick={detectLocation}>
                 <Crosshair className="h-4 w-4" /> Detect
               </Button>
-            </div>
-            <div className="mt-2 grid h-40 place-items-center rounded-xl border border-dashed border-border bg-secondary/30 text-sm text-muted-foreground">
-              <span className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" /> Map preview (integration ready)
-              </span>
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label>Upload Photos</Label>
-            <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-secondary/30 px-4 py-8 text-center transition-colors hover:border-primary/40">
-              <Upload className="h-6 w-6 text-primary" />
-              <span className="text-sm font-medium">Drag & drop or click to upload</span>
-              <span className="text-xs text-muted-foreground">
-                Multiple images supported • Stored on AWS S3 (integration ready)
-              </span>
-              <input type="file" multiple accept="image/*" className="hidden" />
-            </label>
-            <div className="mt-2 flex gap-2">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="grid h-16 w-16 place-items-center rounded-lg border border-border bg-secondary/40 text-muted-foreground"
+            <Label>Upload Photo</Label>
+            {!previewUrl ? (
+              <label
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragActive(true);
+                }}
+                onDragLeave={() => setDragActive(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragActive(false);
+                  handleFile(e.dataTransfer.files?.[0] ?? null);
+                }}
+                className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed bg-secondary/30 px-4 py-8 text-center transition-colors ${
+                  dragActive ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
+                }`}
+              >
+                <Upload className="h-6 w-6 text-primary" />
+                <span className="text-sm font-medium">Drag & drop or click to upload</span>
+                <span className="text-xs text-muted-foreground">
+                  JPG, PNG or WEBP • up to 10 MB
+                </span>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+                />
+              </label>
+            ) : (
+              <div className="relative overflow-hidden rounded-xl border border-border">
+                <img
+                  src={previewUrl}
+                  alt="Selected issue preview"
+                  className="max-h-64 w-full object-cover"
+                />
+                {uploading && (
+                  <div className="absolute inset-0 grid place-items-center bg-background/60">
+                    <span className="flex items-center gap-2 text-sm font-medium">
+                      <Loader2 className="h-4 w-4 animate-spin" /> Uploading…
+                    </span>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={clearImage}
+                  disabled={uploading}
+                  className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-background/80 text-foreground shadow transition-colors hover:bg-destructive hover:text-destructive-foreground disabled:opacity-50"
+                  aria-label="Remove image"
                 >
-                  <ImageIcon className="h-5 w-5" />
-                </div>
-              ))}
-            </div>
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
           </div>
 
-          <Button type="submit" variant="hero" size="lg" className="w-full">
-            Submit Complaint <Send className="h-4 w-4" />
+          <Button type="submit" variant="hero" size="lg" className="w-full" disabled={busy}>
+            {busy ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" /> Submitting…
+              </>
+            ) : (
+              <>
+                Submit Complaint <Send className="h-4 w-4" />
+              </>
+            )}
           </Button>
         </motion.form>
       </div>

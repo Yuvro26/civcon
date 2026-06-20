@@ -15,12 +15,13 @@ import {
   Send,
   ClipboardCheck,
   CheckCircle2,
-  Quote,
+
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 
 import { useAuth } from "@/lib/auth";
+import { useIssueStats } from "@/lib/issues";
 import heroCity from "@/assets/hero-city.jpg";
 
 export const Route = createFileRoute("/")({
@@ -64,33 +65,13 @@ const STEPS = [
   { icon: CheckCircle2, title: "Issue Resolved", desc: "Track progress until it's fully resolved." },
 ];
 
-const STATS = [
-  { value: "48,200+", label: "Issues Reported" },
-  { value: "41,500+", label: "Issues Resolved" },
-  { value: "120+", label: "Wards Covered" },
-  { value: "96%", label: "Satisfaction Rate" },
+const STAT_LABELS: { key: "total" | "resolved" | "pending" | "in_progress"; label: string }[] = [
+  { key: "total", label: "Issues Reported" },
+  { key: "resolved", label: "Issues Resolved" },
+  { key: "pending", label: "Pending Issues" },
+  { key: "in_progress", label: "In Progress" },
 ];
 
-const STORIES = [
-  {
-    quote:
-      "Reported a dangerous pothole on my street — it was fixed within 4 days. CivicConnect actually works!",
-    name: "Aarav Sharma",
-    role: "City Hero • 48 reports",
-  },
-  {
-    quote:
-      "The dark streetlight near my home was repaired after years of complaints. The tracking kept me informed throughout.",
-    name: "Priya Nair",
-    role: "Gold Reporter • 39 reports",
-  },
-  {
-    quote:
-      "Garbage collection in our colony improved drastically once the whole community started reporting through the app.",
-    name: "Rohan Mehta",
-    role: "Gold Reporter • 31 reports",
-  },
-];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -102,6 +83,7 @@ function Section({ children, className = "" }: { children: React.ReactNode; clas
 }
 
 function Landing() {
+  const { stats } = useIssueStats();
   return (
     <SiteLayout>
       {/* HERO */}
@@ -181,22 +163,33 @@ function Landing() {
 
       {/* STATS */}
       <Section className="-mt-6">
-        <div className="glass-card grid grid-cols-2 gap-6 rounded-3xl p-8 sm:grid-cols-4">
-          {STATS.map((s, i) => (
-            <motion.div
-              key={s.label}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true }}
-              variants={fadeUp}
-              transition={{ delay: i * 0.08 }}
-              className="text-center"
-            >
-              <div className="text-3xl font-extrabold text-gradient sm:text-4xl">{s.value}</div>
-              <div className="mt-1 text-sm text-muted-foreground">{s.label}</div>
-            </motion.div>
-          ))}
-        </div>
+        {stats && stats.total > 0 ? (
+          <div className="glass-card grid grid-cols-2 gap-6 rounded-3xl p-8 sm:grid-cols-4">
+            {STAT_LABELS.map((s, i) => (
+              <motion.div
+                key={s.label}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                transition={{ delay: i * 0.08 }}
+                className="text-center"
+              >
+                <div className="text-3xl font-extrabold text-gradient sm:text-4xl">
+                  {stats[s.key].toLocaleString()}
+                </div>
+                <div className="mt-1 text-sm text-muted-foreground">{s.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="glass-card rounded-3xl p-8 text-center">
+            <p className="text-base font-medium">No issues reported yet.</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Statistics will appear once reports are submitted.
+            </p>
+          </div>
+        )}
       </Section>
 
       {/* FEATURES */}
@@ -261,34 +254,7 @@ function Landing() {
         </div>
       </Section>
 
-      {/* SUCCESS STORIES */}
-      <Section className="mt-28">
-        <SectionHeading
-          eyebrow="Success Stories"
-          title="Real change, made by real citizens"
-          subtitle="Thousands of issues resolved thanks to an engaged community."
-        />
-        <div className="mt-12 grid gap-6 lg:grid-cols-3">
-          {STORIES.map((story, i) => (
-            <motion.div
-              key={story.name}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true }}
-              variants={fadeUp}
-              transition={{ delay: i * 0.08 }}
-              className="glass-card flex flex-col rounded-2xl p-6"
-            >
-              <Quote className="h-7 w-7 text-primary/60" />
-              <p className="mt-4 flex-1 text-sm leading-relaxed text-foreground/90">"{story.quote}"</p>
-              <div className="mt-5">
-                <div className="font-semibold">{story.name}</div>
-                <div className="text-xs text-muted-foreground">{story.role}</div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </Section>
+
 
       {/* CTA */}
       <Section className="mt-28">
