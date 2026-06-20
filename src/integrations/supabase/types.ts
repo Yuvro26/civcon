@@ -139,6 +139,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_category_counts: {
+        Args: never
+        Returns: {
+          name: string
+          value: number
+        }[]
+      }
       get_issue_by_ticket: {
         Args: { _ticket: string }
         Returns: {
@@ -155,6 +162,40 @@ export type Database = {
         }[]
       }
       get_issue_stats: { Args: never; Returns: Json }
+      get_leaderboard: {
+        Args: never
+        Returns: {
+          name: string
+          points: number
+          reports: number
+          resolved: number
+        }[]
+      }
+      get_monthly_trend: {
+        Args: never
+        Returns: {
+          month: string
+          reported: number
+          resolved: number
+        }[]
+      }
+      get_recent_resolved: {
+        Args: never
+        Returns: {
+          created_at: string
+          location: string
+          ticket_id: string
+          title: string
+          updated_at: string
+        }[]
+      }
+      get_resolution_trend: {
+        Args: never
+        Returns: {
+          days: number
+          month: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
