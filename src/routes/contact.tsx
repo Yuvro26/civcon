@@ -1,12 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -26,7 +29,61 @@ const INFO = [
   { icon: MapPin, label: "Office", value: "Smart City Tower, Sector 14" },
 ];
 
+const contactSchema = z.object({
+  name: z.string().trim().min(1, "Name is required.").max(100, "Name is too long."),
+  email: z.string().trim().email("Please enter a valid email address.").max(255),
+  phone: z
+    .string()
+    .trim()
+    .max(20)
+    .refine((v) => v === "" || /^[+\d][\d\s-]{6,}$/.test(v), "Please enter a valid phone number."),
+  subject: z.string().trim().min(1, "Subject is required.").max(150, "Subject is too long."),
+  message: z.string().trim().min(1, "Message is required.").max(2000, "Message is too long."),
+});
+
+type Errors = Partial<Record<keyof z.infer<typeof contactSchema>, string>>;
+
 function Contact() {
+  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
+  const [errors, setErrors] = useState<Errors>({});
+  const [submitting, setSubmitting] = useState(false);
+
+  const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm((f) => ({ ...f, [key]: e.target.value }));
+    setErrors((prev) => ({ ...prev, [key]: undefined }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = contactSchema.safeParse(form);
+    if (!parsed.success) {
+      const fieldErrors: Errors = {};
+      for (const issue of parsed.error.issues) {
+        fieldErrors[issue.path[0] as keyof Errors] = issue.message;
+      }
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.from("contact_messages").insert({
+        name: parsed.data.name,
+        email: parsed.data.email,
+        phone: parsed.data.phone || null,
+        subject: parsed.data.subject,
+        message: parsed.data.message,
+      });
+      if (error) throw error;
+      toast.success("Your message has been sent successfully.");
+      setForm({ name: "", email: "", phone: "", subject: "", message: "" });
+    } catch {
+      toast.error("Could not send your message. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <SiteLayout>
       <div className="py-8">
@@ -51,7 +108,7 @@ function Contact() {
             ))}
             <div className="glass-card grid h-44 place-items-center rounded-2xl text-sm text-muted-foreground">
               <span className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" /> Google Maps (integration ready)
+                <MapPin className="h-4 w-4" /> Smart City Tower, Sector 14
               </span>
             </div>
           </div>
@@ -59,26 +116,47 @@ function Contact() {
           <motion.form
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            onSubmit={(e) => {
-              e.preventDefault();
-              toast.success("Message sent! We'll get back to you soon.");
-            }}
+            onSubmit={handleSubmit}
+            noValidate
             className="glass-card space-y-4 rounded-2xl p-6 lg:col-span-3"
           >
             <div className="space-y-1.5">
-              <Label htmlFor="c-name">Name</Label>
-              <Input id="c-name" placeholder="Your name" required />
+              <Label htmlFor="c-name">Full Name</Label>
+              <Input id="c-name" value={form.name} onChange={update("name")} placeholder="Your name" />
+              {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="c-email">Email</Label>
+                <Input id="c-email" type="email" value={form.email} onChange={update("email")} placeholder="you@email.com" />
+                {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="c-phone">Phone Number <span className="text-muted-foreground">(optional)</span></Label>
+                <Input id="c-phone" value={form.phone} onChange={update("phone")} placeholder="+91 9XXXXXXXXX" />
+                {errors.phone && <p className="text-xs text-destructive">{errors.phone}</p>}
+              </div>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="c-email">Email</Label>
-              <Input id="c-email" type="email" placeholder="you@email.com" required />
+              <Label htmlFor="c-subject">Subject</Label>
+              <Input id="c-subject" value={form.subject} onChange={update("subject")} placeholder="What is this about?" />
+              {errors.subject && <p className="text-xs text-destructive">{errors.subject}</p>}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="c-msg">Message</Label>
-              <Textarea id="c-msg" rows={5} placeholder="How can we help?" required />
+              <Textarea id="c-msg" rows={5} value={form.message} onChange={update("message")} placeholder="How can we help?" />
+              {errors.message && <p className="text-xs text-destructive">{errors.message}</p>}
             </div>
-            <Button type="submit" variant="hero" size="lg" className="w-full">
-              Send Message <Send className="h-4 w-4" />
+            <Button type="submit" variant="hero" size="lg" className="w-full" disabled={submitting}>
+              {submitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Sending…
+                </>
+              ) : (
+                <>
+                  Send Message <Send className="h-4 w-4" />
+                </>
+              )}
             </Button>
           </motion.form>
         </div>
