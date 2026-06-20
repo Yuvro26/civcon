@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          phone: string | null
+          subject: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          phone?: string | null
+          subject: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string | null
+          subject?: string
+        }
+        Relationships: []
+      }
+      issues: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          location: string | null
+          priority: string
+          status: string
+          ticket_id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          priority?: string
+          status?: string
+          ticket_id: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          priority?: string
+          status?: string
+          ticket_id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -64,6 +139,63 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_category_counts: {
+        Args: never
+        Returns: {
+          name: string
+          value: number
+        }[]
+      }
+      get_issue_by_ticket: {
+        Args: { _ticket: string }
+        Returns: {
+          category: string
+          created_at: string
+          description: string
+          image_url: string
+          location: string
+          priority: string
+          status: string
+          ticket_id: string
+          title: string
+          updated_at: string
+        }[]
+      }
+      get_issue_stats: { Args: never; Returns: Json }
+      get_leaderboard: {
+        Args: never
+        Returns: {
+          name: string
+          points: number
+          reports: number
+          resolved: number
+        }[]
+      }
+      get_monthly_trend: {
+        Args: never
+        Returns: {
+          month: string
+          reported: number
+          resolved: number
+        }[]
+      }
+      get_recent_resolved: {
+        Args: never
+        Returns: {
+          created_at: string
+          location: string
+          ticket_id: string
+          title: string
+          updated_at: string
+        }[]
+      }
+      get_resolution_trend: {
+        Args: never
+        Returns: {
+          days: number
+          month: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
