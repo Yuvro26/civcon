@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Lock, ShieldCheck, ArrowRight } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ShieldCheck, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { validateEmail, validatePassword } from "@/lib/auth";
 import { ensureAdmin, checkAdminExists } from "@/lib/auth.functions";
+
 
 export const Route = createFileRoute("/admin")({
   component: AdminAuth,
@@ -21,6 +22,8 @@ function AdminAuth() {
   const doEnsureAdmin = useServerFn(ensureAdmin);
   const doCheckAdminExists = useServerFn(checkAdminExists);
   const [hasAdmin, setHasAdmin] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
 
   useEffect(() => {
     doCheckAdminExists()
@@ -111,7 +114,22 @@ function AdminAuth() {
               <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input id="password" name="password" type="password" placeholder="••••••••" className="pl-9" required />
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  className="pl-9 pr-10"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
             <Button type="submit" variant="hero" size="lg" className="w-full">

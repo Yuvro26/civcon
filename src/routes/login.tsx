@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { Mail, Lock, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { validateEmail } from "@/lib/auth";
+
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -20,6 +22,8 @@ function Login() {
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
   const destination = redirect === "/report" ? "/report" : "/";
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       <div className="absolute inset-0 -z-10 bg-hero-glow opacity-60" />
@@ -77,7 +81,22 @@ function Login() {
               <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input id="password" name="password" type="password" placeholder="••••••••" className="pl-9" required />
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  className="pl-9 pr-10"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
             <div className="flex justify-end">
