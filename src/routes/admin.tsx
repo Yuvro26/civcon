@@ -22,6 +22,8 @@ function AdminAuth() {
   const doEnsureAdmin = useServerFn(ensureAdmin);
   const doCheckAdminExists = useServerFn(checkAdminExists);
   const [hasAdmin, setHasAdmin] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
 
   useEffect(() => {
     doCheckAdminExists()
