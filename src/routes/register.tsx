@@ -126,12 +126,31 @@ function Field({
   type?: string;
   placeholder?: string;
 }) {
+  const isPassword = type === "password";
+  const [show, setShow] = useState(false);
+  const inputType = isPassword ? (show ? "text" : "password") : type;
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id}>{label}</Label>
       <div className="relative">
         <Icon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input id={id} type={type} placeholder={placeholder} className="pl-9" required />
+        <Input
+          id={id}
+          type={inputType}
+          placeholder={placeholder}
+          className={isPassword ? "pl-9 pr-10" : "pl-9"}
+          required
+        />
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setShow((v) => !v)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+            aria-label={show ? "Hide password" : "Show password"}
+          >
+            {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        )}
       </div>
     </div>
   );
