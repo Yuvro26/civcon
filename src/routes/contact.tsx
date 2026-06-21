@@ -23,10 +23,30 @@ export const Route = createFileRoute("/contact")({
   component: Contact,
 });
 
+const MAPS_URL =
+  "https://www.google.com/maps/search/?api=1&query=" +
+  encodeURIComponent("Magicbus Center, Thane");
+
 const INFO = [
-  { icon: Mail, label: "Email", value: "support@civicconnect.app" },
-  { icon: Phone, label: "Phone", value: "+91 1800 200 300" },
-  { icon: MapPin, label: "Office", value: "Smart City Tower, Sector 14" },
+  {
+    icon: Mail,
+    label: "Email",
+    value: "gaikwadyashraj368@gmail.com",
+    href: "mailto:gaikwadyashraj368@gmail.com",
+  },
+  {
+    icon: Phone,
+    label: "Phone",
+    value: "+91 7757886982",
+    href: "tel:+917757886982",
+  },
+  {
+    icon: MapPin,
+    label: "Location",
+    value: "Magicbus Center, Thane",
+    href: MAPS_URL,
+    external: true,
+  },
 ];
 
 const contactSchema = z.object({
