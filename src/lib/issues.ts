@@ -247,7 +247,7 @@ export function useMyIssues() {
     if (error) {
       setError(error.message);
     } else {
-      setIssues((data as IssueRow[]) ?? []);
+      setIssues((data ?? []).map((r) => rowToIssue(r as Record<string, unknown>)));
       setError(null);
     }
     setLoading(false);
@@ -277,7 +277,7 @@ export function useAllIssues(enabled: boolean) {
       .from("issues")
       .select("*")
       .order("created_at", { ascending: false });
-    if (!error) setIssues((data as IssueRow[]) ?? []);
+    if (!error) setIssues((data ?? []).map((r) => rowToIssue(r as Record<string, unknown>)));
     setLoading(false);
   }, [enabled]);
 
