@@ -312,8 +312,9 @@ function ReportIssue() {
           </div>
 
           <div className="space-y-1.5">
-            <Label>Upload Photo</Label>
-            {!previewUrl ? (
+            <Label>Attachments <span className="text-muted-foreground">(optional, up to {MAX_FILES})</span></Label>
+
+            {canAddMore && (
               <label
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -323,7 +324,7 @@ function ReportIssue() {
                 onDrop={(e) => {
                   e.preventDefault();
                   setDragActive(false);
-                  handleFile(e.dataTransfer.files?.[0] ?? null);
+                  addFiles(e.dataTransfer.files);
                 }}
                 className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed bg-secondary/30 px-4 py-8 text-center transition-colors ${
                   dragActive ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
@@ -332,42 +333,78 @@ function ReportIssue() {
                 <Upload className="h-6 w-6 text-primary" />
                 <span className="text-sm font-medium">Drag & drop or click to upload</span>
                 <span className="text-xs text-muted-foreground">
-                  JPG, PNG or WEBP • up to 10 MB
+                  JPG, JPEG, PNG, WEBP or PDF • up to 10 MB each • max {MAX_FILES} files
                 </span>
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
                   className="hidden"
-                  onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+                  onChange={(e) => addFiles(e.target.files)}
                 />
               </label>
-            ) : (
-              <div className="relative overflow-hidden rounded-xl border border-border">
-                <img
-                  src={previewUrl}
-                  alt="Selected issue preview"
-                  className="max-h-64 w-full object-cover"
-                />
-                {uploading && (
-                  <div className="absolute inset-0 grid place-items-center bg-background/60">
-                    <span className="flex items-center gap-2 text-sm font-medium">
-                      <Loader2 className="h-4 w-4 animate-spin" /> Uploading…
-                    </span>
+            )}
+
+            {files.length > 0 && (
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {files.map((f) => (
+                  <div
+                    key={f.id}
+                    className="relative flex gap-3 rounded-xl border border-border bg-secondary/30 p-2.5"
+                  >
+                    <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-background">
+                      {f.previewUrl ? (
+                        <img src={f.previewUrl} alt={f.file.name} className="h-full w-full object-cover" />
+                      ) : (
+                        <FileText className="h-6 w-6 text-primary" />
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="truncate text-sm font-medium">{f.file.name}</span>
+                        {f.status === "done" && (
+                          <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-primary" />
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {(f.file.size / (1024 * 1024)).toFixed(2)} MB
+                      </div>
+
+                      {f.status === "uploading" && (
+                        <div className="mt-1.5 flex items-center gap-2">
+                          <Progress value={f.progress} className="h-1.5 flex-1" />
+                          <span className="text-[10px] tabular-nums text-muted-foreground">
+                            {f.progress}%
+                          </span>
+                        </div>
+                      )}
+                      {f.status === "error" && (
+                        <button
+                          type="button"
+                          onClick={() => uploadOne(f)}
+                          className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-destructive hover:underline"
+                        >
+                          <RotateCw className="h-3 w-3" /> Upload failed — retry
+                        </button>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => removeFile(f.id)}
+                      className="grid h-7 w-7 shrink-0 place-items-center self-start rounded-full bg-background/80 text-foreground shadow transition-colors hover:bg-destructive hover:text-destructive-foreground"
+                      aria-label={`Remove ${f.file.name}`}
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
                   </div>
-                )}
-                <button
-                  type="button"
-                  onClick={clearImage}
-                  disabled={uploading}
-                  className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-background/80 text-foreground shadow transition-colors hover:bg-destructive hover:text-destructive-foreground disabled:opacity-50"
-                  aria-label="Remove image"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                ))}
               </div>
             )}
           </div>
+
 
           <Button type="submit" variant="hero" size="lg" className="w-full" disabled={busy}>
             {busy ? (
