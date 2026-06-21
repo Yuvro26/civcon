@@ -1,13 +1,24 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Upload, Send, Crosshair, X, Loader2 } from "lucide-react";
+import {
+  MapPin,
+  Upload,
+  Send,
+  Crosshair,
+  X,
+  Loader2,
+  FileText,
+  RotateCw,
+  CheckCircle2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -19,14 +30,29 @@ import { CATEGORIES, type IssuePriority } from "@/lib/demo-data";
 import { useAuth } from "@/lib/auth";
 import {
   createIssue,
-  uploadIssueImage,
-  removeIssueImage,
-  validateImageFile,
+  uploadIssueFile,
+  removeIssueFile,
+  validateFile,
+  isImageType,
+  MAX_FILES,
+  type Attachment,
 } from "@/lib/issues";
 
 export const Route = createFileRoute("/report")({
   component: ReportIssue,
 });
+
+type FileStatus = "pending" | "uploading" | "done" | "error";
+
+interface SelectedFile {
+  id: string;
+  file: File;
+  previewUrl: string | null; // for images
+  status: FileStatus;
+  progress: number;
+  attachment: Attachment | null;
+}
+
 
 const PRIORITIES: IssuePriority[] = ["Low", "Medium", "High"];
 
