@@ -3,8 +3,24 @@ import { supabase } from "@/integrations/supabase/client";
 import type { IssuePriority, IssueStatus } from "@/lib/demo-data";
 
 export const BUCKET = "issue-images";
-export const ACCEPTED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-export const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB
+export const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+export const ACCEPTED_DOC_TYPES = ["application/pdf"];
+export const ACCEPTED_TYPES = [...ACCEPTED_IMAGE_TYPES, ...ACCEPTED_DOC_TYPES];
+export const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
+export const MAX_FILES = 4;
+
+// Backwards-compatible aliases
+export const MAX_IMAGE_BYTES = MAX_FILE_BYTES;
+
+export interface Attachment {
+  path: string;
+  name: string;
+  type: string;
+}
+
+export function isImageType(type: string): boolean {
+  return ACCEPTED_IMAGE_TYPES.includes(type.toLowerCase());
+}
 
 export interface IssueRow {
   id: string;
@@ -16,6 +32,7 @@ export interface IssueRow {
   description: string;
   location: string | null;
   image_url: string | null;
+  attachments: Attachment[];
   status: IssueStatus;
   created_at: string;
   updated_at: string;
