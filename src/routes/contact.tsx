@@ -116,22 +116,34 @@ function Contact() {
         <div className="mx-auto mt-12 grid max-w-5xl gap-6 px-4 lg:grid-cols-5">
           <div className="space-y-4 lg:col-span-2">
             {INFO.map((item) => (
-              <div key={item.label} className="glass-card flex items-center gap-4 rounded-2xl p-5">
+              <a
+                key={item.label}
+                href={item.href}
+                target={item.external ? "_blank" : undefined}
+                rel={item.external ? "noopener noreferrer" : undefined}
+                className="glass-card flex items-center gap-4 rounded-2xl p-5 transition-colors hover:border-primary/40"
+              >
                 <div className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-primary text-primary-foreground">
                   <item.icon className="h-5 w-5" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="text-xs text-muted-foreground">{item.label}</div>
-                  <div className="font-medium">{item.value}</div>
+                  <div className="break-all font-medium">{item.value}</div>
                 </div>
-              </div>
+              </a>
             ))}
-            <div className="glass-card grid h-44 place-items-center rounded-2xl text-sm text-muted-foreground">
+            <a
+              href={MAPS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="glass-card grid h-44 place-items-center rounded-2xl text-sm text-muted-foreground transition-colors hover:border-primary/40"
+            >
               <span className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" /> Smart City Tower, Sector 14
+                <MapPin className="h-4 w-4" /> Magicbus Center, Thane
               </span>
-            </div>
+            </a>
           </div>
+
 
           <motion.form
             initial={{ opacity: 0, y: 24 }}
