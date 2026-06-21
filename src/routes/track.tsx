@@ -138,13 +138,11 @@ function TrackIssue() {
               <h3 className="mt-3 text-lg font-semibold">{issue.title}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{issue.description}</p>
 
-              {issue.image_url && (
-                <IssueImage
-                  path={issue.image_url}
-                  alt={issue.title}
-                  className="mt-4 h-44 w-full"
-                />
-              )}
+              <AttachmentGallery
+                attachments={attachmentsForIssue(issue)}
+                className="mt-4"
+              />
+
 
               <dl className="mt-5 space-y-3 text-sm">
                 <Row label="Category" value={issue.category} />
