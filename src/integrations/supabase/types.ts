@@ -46,6 +46,7 @@ export type Database = {
       }
       issues: {
         Row: {
+          attachments: Json
           category: string
           created_at: string
           description: string
@@ -60,6 +61,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          attachments?: Json
           category: string
           created_at?: string
           description: string
@@ -74,6 +76,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          attachments?: Json
           category?: string
           created_at?: string
           description?: string
@@ -149,6 +152,7 @@ export type Database = {
       get_issue_by_ticket: {
         Args: { _ticket: string }
         Returns: {
+          attachments: Json
           category: string
           created_at: string
           description: string

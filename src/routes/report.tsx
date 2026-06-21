@@ -1,13 +1,24 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Upload, Send, Crosshair, X, Loader2 } from "lucide-react";
+import {
+  MapPin,
+  Upload,
+  Send,
+  Crosshair,
+  X,
+  Loader2,
+  FileText,
+  RotateCw,
+  CheckCircle2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -19,14 +30,29 @@ import { CATEGORIES, type IssuePriority } from "@/lib/demo-data";
 import { useAuth } from "@/lib/auth";
 import {
   createIssue,
-  uploadIssueImage,
-  removeIssueImage,
-  validateImageFile,
+  uploadIssueFile,
+  removeIssueFile,
+  validateFile,
+  isImageType,
+  MAX_FILES,
+  type Attachment,
 } from "@/lib/issues";
 
 export const Route = createFileRoute("/report")({
   component: ReportIssue,
 });
+
+type FileStatus = "pending" | "uploading" | "done" | "error";
+
+interface SelectedFile {
+  id: string;
+  file: File;
+  previewUrl: string | null; // for images
+  status: FileStatus;
+  progress: number;
+  attachment: Attachment | null;
+}
+
 
 const PRIORITIES: IssuePriority[] = ["Low", "Medium", "High"];
 
@@ -37,10 +63,8 @@ function ReportIssue() {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
 
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [files, setFiles] = useState<SelectedFile[]>([]);
   const [dragActive, setDragActive] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -55,29 +79,72 @@ function ReportIssue() {
 
   useEffect(() => {
     return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      files.forEach((f) => f.previewUrl && URL.revokeObjectURL(f.previewUrl));
     };
-  }, [previewUrl]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading || !isLoggedIn) return null;
 
-  const handleFile = (selected: File | null) => {
-    if (!selected) return;
-    const err = validateImageFile(selected);
-    if (err) {
-      toast.error(err);
-      return;
-    }
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setFile(selected);
-    setPreviewUrl(URL.createObjectURL(selected));
+  const updateFile = (id: string, patch: Partial<SelectedFile>) => {
+    setFiles((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
   };
 
-  const clearImage = () => {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setFile(null);
-    setPreviewUrl(null);
+  const uploadOne = async (item: SelectedFile) => {
+    updateFile(item.id, { status: "uploading", progress: 0 });
+    try {
+      const attachment = await uploadIssueFile(item.file, (p) =>
+        updateFile(item.id, { progress: p }),
+      );
+      updateFile(item.id, { status: "done", progress: 100, attachment });
+    } catch {
+      updateFile(item.id, { status: "error" });
+      toast.error(`Could not upload "${item.file.name}". You can retry.`);
+    }
+  };
+
+  const addFiles = (incoming: FileList | File[] | null) => {
+    if (!incoming) return;
+    const list = Array.from(incoming);
+    if (list.length === 0) return;
+
+    setFiles((prev) => {
+      const next = [...prev];
+      for (const file of list) {
+        if (next.length >= MAX_FILES) {
+          toast.error("Maximum 4 files are allowed.");
+          break;
+        }
+        const err = validateFile(file);
+        if (err) {
+          toast.error(err);
+          continue;
+        }
+        const item: SelectedFile = {
+          id: crypto.randomUUID(),
+          file,
+          previewUrl: isImageType(file.type) ? URL.createObjectURL(file) : null,
+          status: "pending",
+          progress: 0,
+          attachment: null,
+        };
+        next.push(item);
+        // kick off upload immediately
+        void uploadOne(item);
+      }
+      return next;
+    });
+
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const removeFile = (id: string) => {
+    setFiles((prev) => {
+      const target = prev.find((f) => f.id === id);
+      if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl);
+      if (target?.attachment) void removeIssueFile(target.attachment.path).catch(() => {});
+      return prev.filter((f) => f.id !== id);
+    });
   };
 
   const detectLocation = () => {
@@ -97,55 +164,58 @@ function ReportIssue() {
     );
   };
 
+  const resetForm = () => {
+    files.forEach((f) => f.previewUrl && URL.revokeObjectURL(f.previewUrl));
+    setTitle("");
+    setCategory("");
+    setPriority("Medium");
+    setDescription("");
+    setLocation("");
+    setFiles([]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return toast.error("Please enter an issue title.");
     if (!category) return toast.error("Please select a category.");
     if (!description.trim()) return toast.error("Please add a description.");
 
-    setSubmitting(true);
-    let imagePath: string | null = null;
-    try {
-      if (file) {
-        setUploading(true);
-        try {
-          imagePath = await uploadIssueImage(file);
-        } catch {
-          toast.error("Image upload failed. Please try again.");
-          setUploading(false);
-          setSubmitting(false);
-          return;
-        }
-        setUploading(false);
-      }
+    if (files.some((f) => f.status === "uploading")) {
+      return toast.error("Please wait for files to finish uploading.");
+    }
+    if (files.some((f) => f.status === "error")) {
+      return toast.error("Some files failed to upload. Retry or remove them.");
+    }
 
+    const attachments = files
+      .map((f) => f.attachment)
+      .filter((a): a is Attachment => a !== null);
+
+    setSubmitting(true);
+    try {
       const issue = await createIssue(
         { title, category, priority, description, location },
-        imagePath,
+        attachments,
       );
 
       toast.success(`Complaint submitted! Your ID is ${issue.ticket_id}.`);
-      // reset form
-      setTitle("");
-      setCategory("");
-      setPriority("Medium");
-      setDescription("");
-      setLocation("");
-      clearImage();
+      resetForm();
       navigate({ to: "/track", search: { id: issue.ticket_id } });
     } catch (err) {
-      // roll back uploaded image if the DB insert failed
-      if (imagePath) await removeIssueImage(imagePath).catch(() => {});
       toast.error(
         err instanceof Error ? err.message : "Something went wrong. Please try again.",
       );
     } finally {
-      setUploading(false);
       setSubmitting(false);
     }
   };
 
-  const busy = submitting || uploading;
+  const anyUploading = files.some((f) => f.status === "uploading");
+  const busy = submitting || anyUploading;
+  const canAddMore = files.length < MAX_FILES;
+
+
 
   return (
     <SiteLayout>
@@ -242,8 +312,9 @@ function ReportIssue() {
           </div>
 
           <div className="space-y-1.5">
-            <Label>Upload Photo</Label>
-            {!previewUrl ? (
+            <Label>Attachments <span className="text-muted-foreground">(optional, up to {MAX_FILES})</span></Label>
+
+            {canAddMore && (
               <label
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -253,7 +324,7 @@ function ReportIssue() {
                 onDrop={(e) => {
                   e.preventDefault();
                   setDragActive(false);
-                  handleFile(e.dataTransfer.files?.[0] ?? null);
+                  addFiles(e.dataTransfer.files);
                 }}
                 className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed bg-secondary/30 px-4 py-8 text-center transition-colors ${
                   dragActive ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
@@ -262,42 +333,78 @@ function ReportIssue() {
                 <Upload className="h-6 w-6 text-primary" />
                 <span className="text-sm font-medium">Drag & drop or click to upload</span>
                 <span className="text-xs text-muted-foreground">
-                  JPG, PNG or WEBP • up to 10 MB
+                  JPG, JPEG, PNG, WEBP or PDF • up to 10 MB each • max {MAX_FILES} files
                 </span>
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
                   className="hidden"
-                  onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+                  onChange={(e) => addFiles(e.target.files)}
                 />
               </label>
-            ) : (
-              <div className="relative overflow-hidden rounded-xl border border-border">
-                <img
-                  src={previewUrl}
-                  alt="Selected issue preview"
-                  className="max-h-64 w-full object-cover"
-                />
-                {uploading && (
-                  <div className="absolute inset-0 grid place-items-center bg-background/60">
-                    <span className="flex items-center gap-2 text-sm font-medium">
-                      <Loader2 className="h-4 w-4 animate-spin" /> Uploading…
-                    </span>
+            )}
+
+            {files.length > 0 && (
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {files.map((f) => (
+                  <div
+                    key={f.id}
+                    className="relative flex gap-3 rounded-xl border border-border bg-secondary/30 p-2.5"
+                  >
+                    <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-background">
+                      {f.previewUrl ? (
+                        <img src={f.previewUrl} alt={f.file.name} className="h-full w-full object-cover" />
+                      ) : (
+                        <FileText className="h-6 w-6 text-primary" />
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="truncate text-sm font-medium">{f.file.name}</span>
+                        {f.status === "done" && (
+                          <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-primary" />
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {(f.file.size / (1024 * 1024)).toFixed(2)} MB
+                      </div>
+
+                      {f.status === "uploading" && (
+                        <div className="mt-1.5 flex items-center gap-2">
+                          <Progress value={f.progress} className="h-1.5 flex-1" />
+                          <span className="text-[10px] tabular-nums text-muted-foreground">
+                            {f.progress}%
+                          </span>
+                        </div>
+                      )}
+                      {f.status === "error" && (
+                        <button
+                          type="button"
+                          onClick={() => uploadOne(f)}
+                          className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-destructive hover:underline"
+                        >
+                          <RotateCw className="h-3 w-3" /> Upload failed — retry
+                        </button>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => removeFile(f.id)}
+                      className="grid h-7 w-7 shrink-0 place-items-center self-start rounded-full bg-background/80 text-foreground shadow transition-colors hover:bg-destructive hover:text-destructive-foreground"
+                      aria-label={`Remove ${f.file.name}`}
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
                   </div>
-                )}
-                <button
-                  type="button"
-                  onClick={clearImage}
-                  disabled={uploading}
-                  className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-background/80 text-foreground shadow transition-colors hover:bg-destructive hover:text-destructive-foreground disabled:opacity-50"
-                  aria-label="Remove image"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                ))}
               </div>
             )}
           </div>
+
 
           <Button type="submit" variant="hero" size="lg" className="w-full" disabled={busy}>
             {busy ? (

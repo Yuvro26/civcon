@@ -3,8 +3,24 @@ import { supabase } from "@/integrations/supabase/client";
 import type { IssuePriority, IssueStatus } from "@/lib/demo-data";
 
 export const BUCKET = "issue-images";
-export const ACCEPTED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-export const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB
+export const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+export const ACCEPTED_DOC_TYPES = ["application/pdf"];
+export const ACCEPTED_TYPES = [...ACCEPTED_IMAGE_TYPES, ...ACCEPTED_DOC_TYPES];
+export const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
+export const MAX_FILES = 4;
+
+// Backwards-compatible aliases
+export const MAX_IMAGE_BYTES = MAX_FILE_BYTES;
+
+export interface Attachment {
+  path: string;
+  name: string;
+  type: string;
+}
+
+export function isImageType(type: string): boolean {
+  return ACCEPTED_IMAGE_TYPES.includes(type.toLowerCase());
+}
 
 export interface IssueRow {
   id: string;
@@ -16,6 +32,7 @@ export interface IssueRow {
   description: string;
   location: string | null;
   image_url: string | null;
+  attachments: Attachment[];
   status: IssueStatus;
   created_at: string;
   updated_at: string;
@@ -37,40 +54,103 @@ export interface NewIssueInput {
   location: string;
 }
 
-export function validateImageFile(file: File): string | null {
+// Normalize a DB row (attachments comes back as Json) into a typed IssueRow.
+export function normalizeAttachments(value: unknown): Attachment[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((a): a is Record<string, unknown> => !!a && typeof a === "object")
+    .map((a) => ({
+      path: String(a.path ?? ""),
+      name: String(a.name ?? "Attachment"),
+      type: String(a.type ?? ""),
+    }))
+    .filter((a) => a.path);
+}
+
+function rowToIssue(row: Record<string, unknown>): IssueRow {
+  return {
+    ...(row as unknown as IssueRow),
+    attachments: normalizeAttachments(row.attachments),
+  };
+}
+
+// Build a display attachment list, falling back to the legacy single image_url.
+export function attachmentsForIssue(issue: {
+  attachments?: Attachment[] | unknown;
+  image_url?: string | null;
+}): Attachment[] {
+  const list = normalizeAttachments(issue.attachments);
+  if (list.length > 0) return list;
+  if (issue.image_url) {
+    return [{ path: issue.image_url, name: "Photo", type: "image/*" }];
+  }
+  return [];
+}
+
+export function validateFile(file: File): string | null {
   const type = file.type.toLowerCase();
   if (!ACCEPTED_TYPES.includes(type)) {
-    return "Unsupported file type. Use JPG, PNG or WEBP.";
+    return "Only JPG, JPEG, PNG, WEBP and PDF files are supported.";
   }
-  if (file.size > MAX_IMAGE_BYTES) {
-    return "Image is too large. Maximum size is 10 MB.";
+  if (file.size > MAX_FILE_BYTES) {
+    return "Each file must be smaller than 10 MB.";
   }
   return null;
 }
 
-// Upload one image into the user's folder; returns the storage path.
-export async function uploadIssueImage(file: File): Promise<string> {
-  const { data: userData, error: userErr } = await supabase.auth.getUser();
-  if (userErr || !userData.user) throw new Error("You must be signed in to upload.");
+// Backwards-compatible alias.
+export const validateImageFile = validateFile;
 
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const path = `${userData.user.id}/${crypto.randomUUID()}.${ext}`;
+// Upload one file into the user's folder with real progress; returns an Attachment.
+export async function uploadIssueFile(
+  file: File,
+  onProgress?: (percent: number) => void,
+): Promise<Attachment> {
+  const { data: sessionData } = await supabase.auth.getSession();
+  const session = sessionData.session;
+  if (!session) throw new Error("You must be signed in to upload.");
 
-  const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
-    cacheControl: "3600",
-    upsert: false,
-    contentType: file.type,
+  const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
+  const path = `${session.user.id}/${crypto.randomUUID()}.${ext}`;
+  const endpoint = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`;
+
+  await new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", endpoint);
+    xhr.setRequestHeader("authorization", `Bearer ${session.access_token}`);
+    xhr.setRequestHeader("apikey", import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
+    xhr.setRequestHeader("x-upsert", "false");
+    xhr.setRequestHeader("cache-control", "3600");
+    if (file.type) xhr.setRequestHeader("content-type", file.type);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress?.(100);
+        resolve();
+      } else {
+        reject(new Error("Upload failed. Please try again."));
+      }
+    };
+    xhr.onerror = () => reject(new Error("Upload failed. Please try again."));
+    xhr.send(file);
   });
-  if (error) throw error;
-  return path;
+
+  return { path, name: file.name, type: file.type };
 }
 
-export async function removeIssueImage(path: string): Promise<void> {
+export async function removeIssueFile(path: string): Promise<void> {
   await supabase.storage.from(BUCKET).remove([path]);
 }
 
-// Generate a signed URL for a stored image path (private bucket).
-export async function getSignedImageUrl(path: string): Promise<string | null> {
+// Backwards-compatible alias.
+export const removeIssueImage = removeIssueFile;
+
+// Generate a signed URL for a stored file path (private bucket).
+export async function getSignedFileUrl(path: string): Promise<string | null> {
   const { data, error } = await supabase.storage
     .from(BUCKET)
     .createSignedUrl(path, 60 * 60);
@@ -78,9 +158,17 @@ export async function getSignedImageUrl(path: string): Promise<string | null> {
   return data?.signedUrl ?? null;
 }
 
-export async function createIssue(input: NewIssueInput, imagePath: string | null): Promise<IssueRow> {
+// Backwards-compatible alias.
+export const getSignedImageUrl = getSignedFileUrl;
+
+export async function createIssue(
+  input: NewIssueInput,
+  attachments: Attachment[],
+): Promise<IssueRow> {
   const { data: userData, error: userErr } = await supabase.auth.getUser();
   if (userErr || !userData.user) throw new Error("You must be signed in to report an issue.");
+
+  const firstImage = attachments.find((a) => isImageType(a.type));
 
   const { data, error } = await supabase
     .from("issues")
@@ -92,13 +180,14 @@ export async function createIssue(input: NewIssueInput, imagePath: string | null
       priority: input.priority,
       description: input.description.trim(),
       location: input.location.trim() || null,
-      image_url: imagePath,
+      image_url: firstImage?.path ?? null,
+      attachments: attachments as unknown as never,
     })
     .select()
     .single();
 
   if (error) throw error;
-  return data as IssueRow;
+  return rowToIssue(data as Record<string, unknown>);
 }
 
 export async function getIssueByTicket(ticket: string) {
@@ -108,6 +197,7 @@ export async function getIssueByTicket(ticket: string) {
   if (error) throw error;
   return (data && data[0]) || null;
 }
+
 
 // ---- Hooks ----
 
@@ -157,7 +247,7 @@ export function useMyIssues() {
     if (error) {
       setError(error.message);
     } else {
-      setIssues((data as IssueRow[]) ?? []);
+      setIssues((data ?? []).map((r) => rowToIssue(r as Record<string, unknown>)));
       setError(null);
     }
     setLoading(false);
@@ -187,7 +277,7 @@ export function useAllIssues(enabled: boolean) {
       .from("issues")
       .select("*")
       .order("created_at", { ascending: false });
-    if (!error) setIssues((data as IssueRow[]) ?? []);
+    if (!error) setIssues((data ?? []).map((r) => rowToIssue(r as Record<string, unknown>)));
     setLoading(false);
   }, [enabled]);
 

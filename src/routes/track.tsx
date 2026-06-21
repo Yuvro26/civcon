@@ -5,9 +5,9 @@ import { Search, MapPin, CheckCircle2, Circle, Clock, Loader2 } from "lucide-rea
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { IssueImage } from "@/components/site/IssueImage";
+import { AttachmentGallery } from "@/components/site/AttachmentGallery";
 import { TRACK_STAGES, STATUS_STYLES, PRIORITY_STYLES, type IssueStatus, type IssuePriority } from "@/lib/demo-data";
-import { getIssueByTicket } from "@/lib/issues";
+import { getIssueByTicket, attachmentsForIssue, type Attachment } from "@/lib/issues";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/track")({
@@ -25,6 +25,7 @@ interface TrackedIssue {
   description: string;
   location: string | null;
   image_url: string | null;
+  attachments?: Attachment[] | unknown;
   status: string;
   created_at: string;
   updated_at: string;
@@ -137,13 +138,11 @@ function TrackIssue() {
               <h3 className="mt-3 text-lg font-semibold">{issue.title}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{issue.description}</p>
 
-              {issue.image_url && (
-                <IssueImage
-                  path={issue.image_url}
-                  alt={issue.title}
-                  className="mt-4 h-44 w-full"
-                />
-              )}
+              <AttachmentGallery
+                attachments={attachmentsForIssue(issue)}
+                className="mt-4"
+              />
+
 
               <dl className="mt-5 space-y-3 text-sm">
                 <Row label="Category" value={issue.category} />
