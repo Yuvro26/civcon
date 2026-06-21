@@ -63,10 +63,8 @@ function ReportIssue() {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
 
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [files, setFiles] = useState<SelectedFile[]>([]);
   const [dragActive, setDragActive] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -81,29 +79,72 @@ function ReportIssue() {
 
   useEffect(() => {
     return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      files.forEach((f) => f.previewUrl && URL.revokeObjectURL(f.previewUrl));
     };
-  }, [previewUrl]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading || !isLoggedIn) return null;
 
-  const handleFile = (selected: File | null) => {
-    if (!selected) return;
-    const err = validateImageFile(selected);
-    if (err) {
-      toast.error(err);
-      return;
-    }
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setFile(selected);
-    setPreviewUrl(URL.createObjectURL(selected));
+  const updateFile = (id: string, patch: Partial<SelectedFile>) => {
+    setFiles((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
   };
 
-  const clearImage = () => {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setFile(null);
-    setPreviewUrl(null);
+  const uploadOne = async (item: SelectedFile) => {
+    updateFile(item.id, { status: "uploading", progress: 0 });
+    try {
+      const attachment = await uploadIssueFile(item.file, (p) =>
+        updateFile(item.id, { progress: p }),
+      );
+      updateFile(item.id, { status: "done", progress: 100, attachment });
+    } catch {
+      updateFile(item.id, { status: "error" });
+      toast.error(`Could not upload "${item.file.name}". You can retry.`);
+    }
+  };
+
+  const addFiles = (incoming: FileList | File[] | null) => {
+    if (!incoming) return;
+    const list = Array.from(incoming);
+    if (list.length === 0) return;
+
+    setFiles((prev) => {
+      const next = [...prev];
+      for (const file of list) {
+        if (next.length >= MAX_FILES) {
+          toast.error("Maximum 4 files are allowed.");
+          break;
+        }
+        const err = validateFile(file);
+        if (err) {
+          toast.error(err);
+          continue;
+        }
+        const item: SelectedFile = {
+          id: crypto.randomUUID(),
+          file,
+          previewUrl: isImageType(file.type) ? URL.createObjectURL(file) : null,
+          status: "pending",
+          progress: 0,
+          attachment: null,
+        };
+        next.push(item);
+        // kick off upload immediately
+        void uploadOne(item);
+      }
+      return next;
+    });
+
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const removeFile = (id: string) => {
+    setFiles((prev) => {
+      const target = prev.find((f) => f.id === id);
+      if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl);
+      if (target?.attachment) void removeIssueFile(target.attachment.path).catch(() => {});
+      return prev.filter((f) => f.id !== id);
+    });
   };
 
   const detectLocation = () => {
@@ -123,55 +164,58 @@ function ReportIssue() {
     );
   };
 
+  const resetForm = () => {
+    files.forEach((f) => f.previewUrl && URL.revokeObjectURL(f.previewUrl));
+    setTitle("");
+    setCategory("");
+    setPriority("Medium");
+    setDescription("");
+    setLocation("");
+    setFiles([]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return toast.error("Please enter an issue title.");
     if (!category) return toast.error("Please select a category.");
     if (!description.trim()) return toast.error("Please add a description.");
 
-    setSubmitting(true);
-    let imagePath: string | null = null;
-    try {
-      if (file) {
-        setUploading(true);
-        try {
-          imagePath = await uploadIssueImage(file);
-        } catch {
-          toast.error("Image upload failed. Please try again.");
-          setUploading(false);
-          setSubmitting(false);
-          return;
-        }
-        setUploading(false);
-      }
+    if (files.some((f) => f.status === "uploading")) {
+      return toast.error("Please wait for files to finish uploading.");
+    }
+    if (files.some((f) => f.status === "error")) {
+      return toast.error("Some files failed to upload. Retry or remove them.");
+    }
 
+    const attachments = files
+      .map((f) => f.attachment)
+      .filter((a): a is Attachment => a !== null);
+
+    setSubmitting(true);
+    try {
       const issue = await createIssue(
         { title, category, priority, description, location },
-        imagePath,
+        attachments,
       );
 
       toast.success(`Complaint submitted! Your ID is ${issue.ticket_id}.`);
-      // reset form
-      setTitle("");
-      setCategory("");
-      setPriority("Medium");
-      setDescription("");
-      setLocation("");
-      clearImage();
+      resetForm();
       navigate({ to: "/track", search: { id: issue.ticket_id } });
     } catch (err) {
-      // roll back uploaded image if the DB insert failed
-      if (imagePath) await removeIssueImage(imagePath).catch(() => {});
       toast.error(
         err instanceof Error ? err.message : "Something went wrong. Please try again.",
       );
     } finally {
-      setUploading(false);
       setSubmitting(false);
     }
   };
 
-  const busy = submitting || uploading;
+  const anyUploading = files.some((f) => f.status === "uploading");
+  const busy = submitting || anyUploading;
+  const canAddMore = files.length < MAX_FILES;
+
+
 
   return (
     <SiteLayout>
