@@ -25,6 +25,7 @@ interface TrackedIssue {
   description: string;
   location: string | null;
   image_url: string | null;
+  attachments?: Attachment[] | unknown;
   status: string;
   created_at: string;
   updated_at: string;
