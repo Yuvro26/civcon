@@ -5,9 +5,9 @@ import { Search, MapPin, CheckCircle2, Circle, Clock, Loader2 } from "lucide-rea
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { IssueImage } from "@/components/site/IssueImage";
+import { AttachmentGallery } from "@/components/site/AttachmentGallery";
 import { TRACK_STAGES, STATUS_STYLES, PRIORITY_STYLES, type IssueStatus, type IssuePriority } from "@/lib/demo-data";
-import { getIssueByTicket } from "@/lib/issues";
+import { getIssueByTicket, attachmentsForIssue, type Attachment } from "@/lib/issues";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/track")({
