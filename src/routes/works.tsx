@@ -57,7 +57,7 @@ function Works() {
                     <span className="grid h-5 w-5 place-items-center rounded-full bg-gradient-primary text-[10px] font-bold text-primary-foreground">
                       {i + 1}
                     </span>
-                    <h3 className="font-semibold">{step.title}</h3>
+                    <h2 className="font-semibold">{step.title}</h2>
                   </div>
                   <p className="mt-2 text-sm text-muted-foreground">{step.desc}</p>
                 </div>
