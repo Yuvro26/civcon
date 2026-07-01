@@ -156,7 +156,7 @@ function About() {
                 <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-gradient-primary text-xl font-bold text-primary-foreground">
                   {m.name.charAt(0)}
                 </div>
-                <h4 className="mt-4 font-semibold">{m.name}</h4>
+                <h3 className="mt-4 font-semibold">{m.name}</h3>
                 <p className="text-xs text-muted-foreground">{m.role}</p>
               </motion.div>
             ))}
