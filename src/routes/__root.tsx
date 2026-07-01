@@ -90,15 +90,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "CivicConnect — Report Civic Issues in Seconds" },
       {
         property: "og:description",
-        content: "Help build a cleaner, safer, and smarter city. Report and track civic issues in seconds.",
+        content:
+          "Help build a cleaner, safer, and smarter city. Report and track civic issues in seconds with CivicConnect.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "CivicConnect" },
+      { property: "og:url", content: "https://connect-citizen-pro.lovable.app/" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@CivicConnect" },
       { name: "twitter:title", content: "CivicConnect — Report Civic Issues in Seconds" },
-      { name: "description", content: "CivicConnect is a smart platform for citizens to report and track local civic issues." },
-      { property: "og:description", content: "CivicConnect is a smart platform for citizens to report and track local civic issues." },
-      { name: "twitter:description", content: "CivicConnect is a smart platform for citizens to report and track local civic issues." },
+      {
+        name: "twitter:description",
+        content:
+          "Help build a cleaner, safer, and smarter city. Report and track civic issues in seconds with CivicConnect.",
+      },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8912a510-94b7-4426-a77b-7f8b878afcb5/id-preview-5334ddf7--83c1cb5f-edf2-4881-8b0c-2c4d99edb8fa.lovable.app-1780621831421.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8912a510-94b7-4426-a77b-7f8b878afcb5/id-preview-5334ddf7--83c1cb5f-edf2-4881-8b0c-2c4d99edb8fa.lovable.app-1780621831421.png" },
     ],
@@ -114,7 +119,45 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "CivicConnect",
+          url: "https://connect-citizen-pro.lovable.app/",
+          description:
+            "Smart citizen issue reporting platform to report and track local civic issues.",
+          potentialAction: {
+            "@type": "SearchAction",
+            target:
+              "https://connect-citizen-pro.lovable.app/track?ticket={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "CivicConnect",
+          url: "https://connect-citizen-pro.lovable.app/",
+          logo: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8912a510-94b7-4426-a77b-7f8b878afcb5/id-preview-5334ddf7--83c1cb5f-edf2-4881-8b0c-2c4d99edb8fa.lovable.app-1780621831421.png",
+          email: "gaikwadyashraj368@gmail.com",
+          telephone: "+91 7757886982",
+          contactPoint: {
+            "@type": "ContactPoint",
+            email: "gaikwadyashraj368@gmail.com",
+            telephone: "+91 7757886982",
+            contactType: "customer support",
+          },
+        }),
+      },
+    ],
   }),
+
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,

@@ -9,11 +9,30 @@ export const Route = createFileRoute("/about")({
       { title: "About — CivicConnect" },
       { name: "description", content: "Our mission, vision, and the team building CivicConnect." },
       { property: "og:title", content: "About CivicConnect" },
-      { property: "og:description", content: "Connecting Citizens. Solving Problems." },
+      { property: "og:description", content: "Our mission, vision, and the team building CivicConnect — connecting citizens and solving problems." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://connect-citizen-pro.lovable.app/about" },
+    ],
+    links: [{ rel: "canonical", href: "https://connect-citizen-pro.lovable.app/about" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "CivicConnect",
+          url: "https://connect-citizen-pro.lovable.app/",
+          description:
+            "Smart citizen issue reporting platform bridging the gap between citizens and local authorities.",
+          email: "gaikwadyashraj368@gmail.com",
+          telephone: "+91 7757886982",
+        }),
+      },
     ],
   }),
   component: About,
 });
+
 
 const PILLARS = [
   {
@@ -67,7 +86,7 @@ function About() {
       <div className="py-8">
         <PageHeader
           eyebrow="About"
-          title="Building smarter, more responsive cities"
+          title="About CivicConnect"
           subtitle="CivicConnect bridges the gap between citizens and authorities with technology that makes civic action simple."
         />
 
@@ -84,7 +103,7 @@ function About() {
               <div className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-primary text-primary-foreground shadow-glow">
                 <p.icon className="h-6 w-6" />
               </div>
-              <h3 className="mt-5 text-lg font-semibold">{p.title}</h3>
+              <h2 className="mt-5 text-lg font-semibold">{p.title}</h2>
               <p className="mt-2 text-sm text-muted-foreground">{p.desc}</p>
             </motion.div>
           ))}
@@ -94,7 +113,7 @@ function About() {
           <div className="glass-card rounded-2xl p-6">
             <div className="flex items-center gap-2">
               <Heart className="h-5 w-5 text-destructive" />
-              <h3 className="text-lg font-semibold">Why CivicConnect?</h3>
+              <h2 className="text-lg font-semibold">Why CivicConnect?</h2>
             </div>
             <ul className="mt-5 grid gap-3 sm:grid-cols-2">
               {BENEFITS.map((b) => (
@@ -107,7 +126,7 @@ function About() {
           <div className="glass-card rounded-2xl p-6">
             <div className="flex items-center gap-2">
               <Code2 className="h-5 w-5 text-primary" />
-              <h3 className="text-lg font-semibold">Technology Stack</h3>
+              <h2 className="text-lg font-semibold">Technology Stack</h2>
             </div>
             <div className="mt-5 flex flex-wrap gap-2">
               {STACK.map((t) => (
@@ -123,7 +142,7 @@ function About() {
         </div>
 
         <div className="mx-auto mt-16 max-w-6xl px-4">
-          <h3 className="text-center text-2xl font-bold">Meet the Team</h3>
+          <h2 className="text-center text-2xl font-bold">Meet the Team</h2>
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {TEAM.map((m, i) => (
               <motion.div
@@ -137,7 +156,7 @@ function About() {
                 <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-gradient-primary text-xl font-bold text-primary-foreground">
                   {m.name.charAt(0)}
                 </div>
-                <h4 className="mt-4 font-semibold">{m.name}</h4>
+                <h3 className="mt-4 font-semibold">{m.name}</h3>
                 <p className="text-xs text-muted-foreground">{m.role}</p>
               </motion.div>
             ))}

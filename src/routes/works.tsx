@@ -10,10 +10,14 @@ export const Route = createFileRoute("/works")({
       { name: "description", content: "The full lifecycle of a civic complaint on CivicConnect." },
       { property: "og:title", content: "How CivicConnect Works" },
       { property: "og:description", content: "From report to resolution — see the workflow." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://connect-citizen-pro.lovable.app/works" },
     ],
+    links: [{ rel: "canonical", href: "https://connect-citizen-pro.lovable.app/works" }],
   }),
   component: Works,
 });
+
 
 const LIFECYCLE = [
   { icon: FileText, title: "Submitted", desc: "Citizen reports an issue with photos and location." },
@@ -53,7 +57,7 @@ function Works() {
                     <span className="grid h-5 w-5 place-items-center rounded-full bg-gradient-primary text-[10px] font-bold text-primary-foreground">
                       {i + 1}
                     </span>
-                    <h3 className="font-semibold">{step.title}</h3>
+                    <h2 className="font-semibold">{step.title}</h2>
                   </div>
                   <p className="mt-2 text-sm text-muted-foreground">{step.desc}</p>
                 </div>
@@ -64,7 +68,7 @@ function Works() {
 
         <div className="mx-auto mt-12 max-w-4xl px-4">
           <div className="glass-card rounded-3xl p-8 text-center">
-            <h3 className="text-xl font-bold">Architecture at a glance</h3>
+            <h2 className="text-xl font-bold">Architecture at a glance</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               React frontend → Node/Express APIs → MongoDB Atlas, with AWS S3 for images, SNS for
               notifications, Lambda for background processing, and JWT for secure access.

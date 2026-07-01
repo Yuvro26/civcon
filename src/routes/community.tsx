@@ -11,11 +11,15 @@ export const Route = createFileRoute("/community")({
       { title: "Community — CivicConnect" },
       { name: "description", content: "Leaderboard, rewards, and resolved issues from the community." },
       { property: "og:title", content: "CivicConnect Community" },
-      { property: "og:description", content: "Celebrating citizens who make cities better." },
+      { property: "og:description", content: "Celebrating citizens who make cities better through reporting and resolving civic issues." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://connect-citizen-pro.lovable.app/community" },
     ],
+    links: [{ rel: "canonical", href: "https://connect-citizen-pro.lovable.app/community" }],
   }),
   component: Community,
 });
+
 
 const BADGES = [
   { icon: Medal, label: "Active Citizen", tone: "text-amber-600" },
@@ -71,7 +75,7 @@ function Community() {
       <div className="py-8">
         <PageHeader
           eyebrow="Community"
-          title="Citizens making real change"
+          title="CivicConnect Community"
           subtitle="Earn points and badges for every issue you report, verify, and help resolve."
         />
 

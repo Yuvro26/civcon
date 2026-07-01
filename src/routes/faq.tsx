@@ -1,19 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LegalPage } from "@/components/site/LegalPage";
 
-export const Route = createFileRoute("/faq")({
-  head: () => ({
-    meta: [
-      { title: "FAQ — CivicConnect" },
-      {
-        name: "description",
-        content: "Answers to the most common questions about using CivicConnect.",
-      },
-    ],
-  }),
-  component: Faq,
-});
-
 const FAQS = [
   {
     q: "What is CivicConnect?",
@@ -44,6 +31,42 @@ const FAQS = [
     a: "Yes, CivicConnect is completely free for citizens to report and track civic issues.",
   },
 ];
+
+export const Route = createFileRoute("/faq")({
+  head: () => ({
+    meta: [
+      { title: "FAQ — CivicConnect" },
+      {
+        name: "description",
+        content: "Answers to the most common questions about using CivicConnect.",
+      },
+      { property: "og:title", content: "CivicConnect FAQ" },
+      {
+        property: "og:description",
+        content: "Answers to the most common questions about reporting and tracking civic issues on CivicConnect.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://connect-citizen-pro.lovable.app/faq" },
+    ],
+    links: [{ rel: "canonical", href: "https://connect-citizen-pro.lovable.app/faq" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: FAQS.map((item) => ({
+            "@type": "Question",
+            name: item.q,
+            acceptedAnswer: { "@type": "Answer", text: item.a },
+          })),
+        }),
+      },
+    ],
+  }),
+  component: Faq,
+});
+
 
 function Faq() {
   return (

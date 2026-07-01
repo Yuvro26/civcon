@@ -52,7 +52,7 @@ function ImageThumb({
     >
       <img
         src={url}
-        alt={attachment.name}
+        alt={`Attachment for civic issue: ${attachment.name}`}
         loading="lazy"
         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
       />
