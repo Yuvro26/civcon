@@ -9,11 +9,30 @@ export const Route = createFileRoute("/about")({
       { title: "About — CivicConnect" },
       { name: "description", content: "Our mission, vision, and the team building CivicConnect." },
       { property: "og:title", content: "About CivicConnect" },
-      { property: "og:description", content: "Connecting Citizens. Solving Problems." },
+      { property: "og:description", content: "Our mission, vision, and the team building CivicConnect — connecting citizens and solving problems." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://connect-citizen-pro.lovable.app/about" },
+    ],
+    links: [{ rel: "canonical", href: "https://connect-citizen-pro.lovable.app/about" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "CivicConnect",
+          url: "https://connect-citizen-pro.lovable.app/",
+          description:
+            "Smart citizen issue reporting platform bridging the gap between citizens and local authorities.",
+          email: "gaikwadyashraj368@gmail.com",
+          telephone: "+91 7757886982",
+        }),
+      },
     ],
   }),
   component: About,
 });
+
 
 const PILLARS = [
   {
