@@ -86,7 +86,7 @@ function About() {
       <div className="py-8">
         <PageHeader
           eyebrow="About"
-          title="Building smarter, more responsive cities"
+          title="About CivicConnect"
           subtitle="CivicConnect bridges the gap between citizens and authorities with technology that makes civic action simple."
         />
 
