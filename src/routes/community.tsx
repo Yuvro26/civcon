@@ -75,7 +75,7 @@ function Community() {
       <div className="py-8">
         <PageHeader
           eyebrow="Community"
-          title="Citizens making real change"
+          title="CivicConnect Community"
           subtitle="Earn points and badges for every issue you report, verify, and help resolve."
         />
 
