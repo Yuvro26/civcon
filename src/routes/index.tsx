@@ -250,9 +250,23 @@ function Landing() {
               viewport={{ once: true }}
               variants={fadeUp}
               transition={{ delay: (i % 3) * 0.08 }}
-              className="group glass-card rounded-2xl p-6 transition-transform hover:-translate-y-1"
+              onMouseMove={(e) => {
+                const el = e.currentTarget;
+                const rect = el.getBoundingClientRect();
+                el.style.setProperty("--mx", `${e.clientX - rect.left}px`);
+                el.style.setProperty("--my", `${e.clientY - rect.top}px`);
+              }}
+              style={
+                {
+                  "--card-glow": f.glow,
+                  "--card-glow-border": f.glowBorder,
+                } as React.CSSProperties
+              }
+              className="feature-card group glass-card rounded-2xl p-6"
             >
-              <div className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-primary text-primary-foreground shadow-glow">
+              <div
+                className={`grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br ${f.iconGradient} text-white shadow-glow transition-transform duration-300 group-hover:scale-110`}
+              >
                 <f.icon className="h-6 w-6" />
               </div>
               <h3 className="mt-5 text-lg font-semibold">{f.title}</h3>
