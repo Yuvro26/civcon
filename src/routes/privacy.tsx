@@ -9,10 +9,19 @@ export const Route = createFileRoute("/privacy")({
         name: "description",
         content: "How CivicConnect collects, uses, and protects your personal information.",
       },
+      { property: "og:title", content: "CivicConnect Privacy Policy" },
+      {
+        property: "og:description",
+        content: "Learn how CivicConnect collects, uses, and protects your personal information.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://connect-citizen-pro.lovable.app/privacy" },
     ],
+    links: [{ rel: "canonical", href: "https://connect-citizen-pro.lovable.app/privacy" }],
   }),
   component: Privacy,
 });
+
 
 function Privacy() {
   return (
