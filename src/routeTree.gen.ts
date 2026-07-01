@@ -17,6 +17,7 @@ import { Route as ReportRouteImport } from './routes/report'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CommunityRouteImport } from './routes/community'
@@ -64,6 +65,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
@@ -153,6 +161,7 @@ export interface FileRoutesById {
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
@@ -173,6 +182,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/dashboard'
+    | '/faq'
     | '/login'
     | '/privacy'
     | '/register'
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/dashboard'
+    | '/faq'
     | '/login'
     | '/privacy'
     | '/register'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/dashboard'
+    | '/faq'
     | '/login'
     | '/privacy'
     | '/register'
@@ -228,6 +240,7 @@ export interface RootRouteChildren {
   CommunityRoute: typeof CommunityRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
+  FaqRoute: typeof FaqRoute
   LoginRoute: typeof LoginRoute
   PrivacyRoute: typeof PrivacyRoute
   RegisterRoute: typeof RegisterRoute
@@ -294,6 +307,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -364,6 +384,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityRoute: CommunityRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
+  FaqRoute: FaqRoute,
   LoginRoute: LoginRoute,
   PrivacyRoute: PrivacyRoute,
   RegisterRoute: RegisterRoute,
