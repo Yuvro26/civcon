@@ -10,10 +10,14 @@ export const Route = createFileRoute("/works")({
       { name: "description", content: "The full lifecycle of a civic complaint on CivicConnect." },
       { property: "og:title", content: "How CivicConnect Works" },
       { property: "og:description", content: "From report to resolution — see the workflow." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://connect-citizen-pro.lovable.app/works" },
     ],
+    links: [{ rel: "canonical", href: "https://connect-citizen-pro.lovable.app/works" }],
   }),
   component: Works,
 });
+
 
 const LIFECYCLE = [
   { icon: FileText, title: "Submitted", desc: "Citizen reports an issue with photos and location." },
