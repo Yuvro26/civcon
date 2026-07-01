@@ -126,7 +126,7 @@ function About() {
           <div className="glass-card rounded-2xl p-6">
             <div className="flex items-center gap-2">
               <Code2 className="h-5 w-5 text-primary" />
-              <h3 className="text-lg font-semibold">Technology Stack</h3>
+              <h2 className="text-lg font-semibold">Technology Stack</h2>
             </div>
             <div className="mt-5 flex flex-wrap gap-2">
               {STACK.map((t) => (
