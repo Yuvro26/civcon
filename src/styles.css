@@ -168,6 +168,16 @@ html.theme-ready *:not(svg):not(path) {
     box-shadow 0.35s ease;
 }
 
+/* Completely remove the Lovable branding widget (text + floating X) */
+#lovable-badge,
+#lovable-badge * {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+
+
 
 @layer base {
   * {
