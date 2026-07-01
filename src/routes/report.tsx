@@ -355,7 +355,7 @@ function ReportIssue() {
                   >
                     <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-background">
                       {f.previewUrl ? (
-                        <img src={f.previewUrl} alt={f.file.name} className="h-full w-full object-cover" />
+                        <img src={f.previewUrl} alt={`Photo attached to civic issue report: ${f.file.name}`} className="h-full w-full object-cover" />
                       ) : (
                         <FileText className="h-6 w-6 text-primary" />
                       )}
