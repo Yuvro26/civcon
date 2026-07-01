@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { useAuth, logout } from "@/lib/auth";
+import { ThemeToggle } from "@/components/site/ThemeToggle";
 
 const NAV_LINKS = [
   { label: "Home", to: "/" },
@@ -60,6 +61,7 @@ export function Navbar() {
           </div>
 
           <div className="hidden items-center gap-2 md:flex">
+            <ThemeToggle />
             {isLoggedIn ? (
               <Button variant="ghost" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4" /> Logout
@@ -76,13 +78,16 @@ export function Navbar() {
             )}
           </div>
 
-          <button
-            className="rounded-lg p-2 text-foreground md:hidden"
-            onClick={() => setOpen((v) => !v)}
-            aria-label="Toggle menu"
-          >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
+            <button
+              className="rounded-lg p-2 text-foreground"
+              onClick={() => setOpen((v) => !v)}
+              aria-label="Toggle menu"
+            >
+              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </nav>
 
         <AnimatePresence>

@@ -24,9 +24,9 @@ const COLUMNS = [
   {
     title: "Legal",
     links: [
-      { label: "Privacy Policy", to: "/about" },
-      { label: "Terms & Conditions", to: "/about" },
-      { label: "FAQ", to: "/about" },
+      { label: "Privacy Policy", to: "/privacy" },
+      { label: "Terms & Conditions", to: "/terms" },
+      { label: "FAQ", to: "/faq" },
     ],
   },
 ];

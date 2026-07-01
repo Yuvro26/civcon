@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, type CSSProperties } from "react";
 import {
   MapPin,
   Camera,
@@ -48,12 +48,54 @@ function Home() {
 
 
 const FEATURES = [
-  { icon: MapPin, title: "GPS Location Detection", desc: "Auto-pinpoint the exact location of any issue with one tap." },
-  { icon: Camera, title: "Photo Upload", desc: "Attach multiple images so authorities see the real picture." },
-  { icon: Bell, title: "Real-Time Updates", desc: "Instant notifications at every stage of your complaint." },
-  { icon: BarChart3, title: "Issue Tracking", desc: "Follow your complaint from submission to resolution." },
-  { icon: Building2, title: "Authority Dashboard", desc: "A powerful control center for officials and admins." },
-  { icon: Smartphone, title: "Mobile Friendly", desc: "Beautifully responsive on every device, everywhere." },
+  {
+    icon: MapPin,
+    title: "GPS Location Detection",
+    desc: "Auto-pinpoint the exact location of any issue with one tap.",
+    iconGradient: "from-cyan-400 to-blue-500",
+    glow: "rgba(34,211,238,0.28)",
+    glowBorder: "rgba(34,211,238,0.55)",
+  },
+  {
+    icon: Camera,
+    title: "Photo Upload",
+    desc: "Attach multiple images so authorities see the real picture.",
+    iconGradient: "from-purple-500 to-pink-500",
+    glow: "rgba(192,132,252,0.28)",
+    glowBorder: "rgba(192,132,252,0.55)",
+  },
+  {
+    icon: Bell,
+    title: "Real-Time Updates",
+    desc: "Instant notifications at every stage of your complaint.",
+    iconGradient: "from-orange-400 to-yellow-400",
+    glow: "rgba(251,146,60,0.28)",
+    glowBorder: "rgba(251,146,60,0.55)",
+  },
+  {
+    icon: BarChart3,
+    title: "Issue Tracking",
+    desc: "Follow your complaint from submission to resolution.",
+    iconGradient: "from-green-400 to-emerald-500",
+    glow: "rgba(52,211,153,0.28)",
+    glowBorder: "rgba(52,211,153,0.55)",
+  },
+  {
+    icon: Building2,
+    title: "Authority Dashboard",
+    desc: "A powerful control center for officials and admins.",
+    iconGradient: "from-indigo-500 to-violet-500",
+    glow: "rgba(129,140,248,0.28)",
+    glowBorder: "rgba(129,140,248,0.55)",
+  },
+  {
+    icon: Smartphone,
+    title: "Mobile Friendly",
+    desc: "Beautifully responsive on every device, everywhere.",
+    iconGradient: "from-teal-400 to-cyan-500",
+    glow: "rgba(45,212,191,0.28)",
+    glowBorder: "rgba(45,212,191,0.55)",
+  },
 ];
 
 const STEPS = [
@@ -208,9 +250,23 @@ function Landing() {
               viewport={{ once: true }}
               variants={fadeUp}
               transition={{ delay: (i % 3) * 0.08 }}
-              className="group glass-card rounded-2xl p-6 transition-transform hover:-translate-y-1"
+              onMouseMove={(e) => {
+                const el = e.currentTarget;
+                const rect = el.getBoundingClientRect();
+                el.style.setProperty("--mx", `${e.clientX - rect.left}px`);
+                el.style.setProperty("--my", `${e.clientY - rect.top}px`);
+              }}
+              style={
+                {
+                  "--card-glow": f.glow,
+                  "--card-glow-border": f.glowBorder,
+                } as CSSProperties
+              }
+              className="feature-card group glass-card rounded-2xl p-6"
             >
-              <div className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-primary text-primary-foreground shadow-glow">
+              <div
+                className={`grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br ${f.iconGradient} text-white shadow-glow transition-transform duration-300 group-hover:scale-110`}
+              >
                 <f.icon className="h-6 w-6" />
               </div>
               <h3 className="mt-5 text-lg font-semibold">{f.title}</h3>

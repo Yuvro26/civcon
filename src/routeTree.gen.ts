@@ -11,10 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorksRouteImport } from './routes/works'
 import { Route as TrackRouteImport } from './routes/track'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReportRouteImport } from './routes/report'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CommunityRouteImport } from './routes/community'
@@ -34,6 +37,11 @@ const TrackRoute = TrackRouteImport.update({
   path: '/track',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -49,9 +57,19 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -104,10 +122,13 @@ export interface FileRoutesByFullPath {
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/report': typeof ReportRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
 }
@@ -120,10 +141,13 @@ export interface FileRoutesByTo {
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/report': typeof ReportRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
 }
@@ -137,10 +161,13 @@ export interface FileRoutesById {
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/faq': typeof FaqRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/report': typeof ReportRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
 }
@@ -155,10 +182,13 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/dashboard'
+    | '/faq'
     | '/login'
+    | '/privacy'
     | '/register'
     | '/report'
     | '/sitemap.xml'
+    | '/terms'
     | '/track'
     | '/works'
   fileRoutesByTo: FileRoutesByTo
@@ -171,10 +201,13 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/dashboard'
+    | '/faq'
     | '/login'
+    | '/privacy'
     | '/register'
     | '/report'
     | '/sitemap.xml'
+    | '/terms'
     | '/track'
     | '/works'
   id:
@@ -187,10 +220,13 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/dashboard'
+    | '/faq'
     | '/login'
+    | '/privacy'
     | '/register'
     | '/report'
     | '/sitemap.xml'
+    | '/terms'
     | '/track'
     | '/works'
   fileRoutesById: FileRoutesById
@@ -204,10 +240,13 @@ export interface RootRouteChildren {
   CommunityRoute: typeof CommunityRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
+  FaqRoute: typeof FaqRoute
   LoginRoute: typeof LoginRoute
+  PrivacyRoute: typeof PrivacyRoute
   RegisterRoute: typeof RegisterRoute
   ReportRoute: typeof ReportRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermsRoute: typeof TermsRoute
   TrackRoute: typeof TrackRoute
   WorksRoute: typeof WorksRoute
 }
@@ -226,6 +265,13 @@ declare module '@tanstack/react-router' {
       path: '/track'
       fullPath: '/track'
       preLoaderRoute: typeof TrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -249,11 +295,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -324,10 +384,13 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityRoute: CommunityRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
+  FaqRoute: FaqRoute,
   LoginRoute: LoginRoute,
+  PrivacyRoute: PrivacyRoute,
   RegisterRoute: RegisterRoute,
   ReportRoute: ReportRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermsRoute: TermsRoute,
   TrackRoute: TrackRoute,
   WorksRoute: WorksRoute,
 }

@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { SplashScreen } from "@/components/SplashScreen";
+import { ThemeProvider } from "@/lib/theme";
 
 function NotFoundComponent() {
   return (
@@ -124,6 +125,11 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('cc_theme');if(t==='light'){document.documentElement.classList.add('light');}}catch(e){}})();`,
+          }}
+        />
         <HeadContent />
       </head>
       <body>
@@ -169,10 +175,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SplashGate />
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <Toaster position="top-center" richColors />
+      <ThemeProvider>
+        <SplashGate />
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <Toaster position="top-center" richColors />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
