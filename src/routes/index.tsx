@@ -260,7 +260,7 @@ function Landing() {
                 {
                   "--card-glow": f.glow,
                   "--card-glow-border": f.glowBorder,
-                } as React.CSSProperties
+                } as CSSProperties
               }
               className="feature-card group glass-card rounded-2xl p-6"
             >
