@@ -51,12 +51,12 @@ export function Footer() {
               cleaner, safer, and smarter city.
             </p>
             <div className="mt-5 flex gap-2">
-              {SOCIALS.map((Icon, i) => (
+              {SOCIALS.map(({ Icon, label }) => (
                 <a
-                  key={i}
+                  key={label}
                   href="#"
                   className="grid h-9 w-9 place-items-center rounded-lg border border-border/60 text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
-                  aria-label="Social link"
+                  aria-label={label}
                 >
                   <Icon className="h-4 w-4" />
                 </a>
