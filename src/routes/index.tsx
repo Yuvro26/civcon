@@ -48,12 +48,54 @@ function Home() {
 
 
 const FEATURES = [
-  { icon: MapPin, title: "GPS Location Detection", desc: "Auto-pinpoint the exact location of any issue with one tap." },
-  { icon: Camera, title: "Photo Upload", desc: "Attach multiple images so authorities see the real picture." },
-  { icon: Bell, title: "Real-Time Updates", desc: "Instant notifications at every stage of your complaint." },
-  { icon: BarChart3, title: "Issue Tracking", desc: "Follow your complaint from submission to resolution." },
-  { icon: Building2, title: "Authority Dashboard", desc: "A powerful control center for officials and admins." },
-  { icon: Smartphone, title: "Mobile Friendly", desc: "Beautifully responsive on every device, everywhere." },
+  {
+    icon: MapPin,
+    title: "GPS Location Detection",
+    desc: "Auto-pinpoint the exact location of any issue with one tap.",
+    iconGradient: "from-cyan-400 to-blue-500",
+    glow: "rgba(34,211,238,0.28)",
+    glowBorder: "rgba(34,211,238,0.55)",
+  },
+  {
+    icon: Camera,
+    title: "Photo Upload",
+    desc: "Attach multiple images so authorities see the real picture.",
+    iconGradient: "from-purple-500 to-pink-500",
+    glow: "rgba(192,132,252,0.28)",
+    glowBorder: "rgba(192,132,252,0.55)",
+  },
+  {
+    icon: Bell,
+    title: "Real-Time Updates",
+    desc: "Instant notifications at every stage of your complaint.",
+    iconGradient: "from-orange-400 to-yellow-400",
+    glow: "rgba(251,146,60,0.28)",
+    glowBorder: "rgba(251,146,60,0.55)",
+  },
+  {
+    icon: BarChart3,
+    title: "Issue Tracking",
+    desc: "Follow your complaint from submission to resolution.",
+    iconGradient: "from-green-400 to-emerald-500",
+    glow: "rgba(52,211,153,0.28)",
+    glowBorder: "rgba(52,211,153,0.55)",
+  },
+  {
+    icon: Building2,
+    title: "Authority Dashboard",
+    desc: "A powerful control center for officials and admins.",
+    iconGradient: "from-indigo-500 to-violet-500",
+    glow: "rgba(129,140,248,0.28)",
+    glowBorder: "rgba(129,140,248,0.55)",
+  },
+  {
+    icon: Smartphone,
+    title: "Mobile Friendly",
+    desc: "Beautifully responsive on every device, everywhere.",
+    iconGradient: "from-teal-400 to-cyan-500",
+    glow: "rgba(45,212,191,0.28)",
+    glowBorder: "rgba(45,212,191,0.55)",
+  },
 ];
 
 const STEPS = [
