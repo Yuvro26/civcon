@@ -31,7 +31,13 @@ const COLUMNS = [
   },
 ];
 
-const SOCIALS = [Twitter, Linkedin, Instagram, Github, Mail];
+const SOCIALS = [
+  { Icon: Twitter, label: "CivicConnect on Twitter" },
+  { Icon: Linkedin, label: "CivicConnect on LinkedIn" },
+  { Icon: Instagram, label: "CivicConnect on Instagram" },
+  { Icon: Github, label: "CivicConnect on GitHub" },
+  { Icon: Mail, label: "Email CivicConnect" },
+];
 
 export function Footer() {
   return (
