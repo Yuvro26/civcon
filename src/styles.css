@@ -242,3 +242,57 @@ html.theme-ready *:not(svg):not(path) {
 .animate-pulse-glow {
   animation: pulse-glow 4s ease-in-out infinite;
 }
+
+/* ---- Premium primary button glow ---- */
+@utility btn-glow {
+  position: relative;
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--gradient-primary);
+    filter: blur(14px);
+    opacity: 0.45;
+    transform: scale(0.96);
+    transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
+  }
+  &:hover::before {
+    opacity: 0.85;
+    filter: blur(20px);
+    transform: scale(1.04);
+  }
+}
+
+/* ---- Feature card: cursor-follow radial glow + border glow ---- */
+@utility feature-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(
+      260px circle at var(--mx, 50%) var(--my, 50%),
+      var(--card-glow, oklch(0.7 0.16 215 / 22%)),
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  &:hover {
+    transform: translateY(-6px);
+    border-color: var(--card-glow-border, oklch(0.7 0.16 215 / 45%));
+    box-shadow: var(--shadow-glow);
+  }
+  &:hover::before {
+    opacity: 1;
+  }
+}
+
