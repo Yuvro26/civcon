@@ -15,13 +15,50 @@ export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact — CivicConnect" },
-      { name: "description", content: "Get in touch with the CivicConnect team." },
+      {
+        name: "description",
+        content:
+          "Get in touch with the CivicConnect team for questions, partnerships, or feedback. Reach us by email, phone, or the contact form.",
+      },
       { property: "og:title", content: "Contact CivicConnect" },
-      { property: "og:description", content: "We'd love to hear from you." },
+      {
+        property: "og:description",
+        content:
+          "Questions, partnerships, or feedback? Contact the CivicConnect team by email, phone, or our online form.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://connect-citizen-pro.lovable.app/contact" },
+    ],
+    links: [{ rel: "canonical", href: "https://connect-citizen-pro.lovable.app/contact" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "CivicConnect",
+          url: "https://connect-citizen-pro.lovable.app/",
+          email: "gaikwadyashraj368@gmail.com",
+          telephone: "+91 7757886982",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "Magicbus Center",
+            addressLocality: "Thane",
+            addressCountry: "IN",
+          },
+          contactPoint: {
+            "@type": "ContactPoint",
+            email: "gaikwadyashraj368@gmail.com",
+            telephone: "+91 7757886982",
+            contactType: "customer support",
+          },
+        }),
+      },
     ],
   }),
   component: Contact,
 });
+
 
 const MAPS_URL =
   "https://www.google.com/maps/search/?api=1&query=" +
