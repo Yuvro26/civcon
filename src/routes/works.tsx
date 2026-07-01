@@ -68,7 +68,7 @@ function Works() {
 
         <div className="mx-auto mt-12 max-w-4xl px-4">
           <div className="glass-card rounded-3xl p-8 text-center">
-            <h3 className="text-xl font-bold">Architecture at a glance</h3>
+            <h2 className="text-xl font-bold">Architecture at a glance</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               React frontend → Node/Express APIs → MongoDB Atlas, with AWS S3 for images, SNS for
               notifications, Lambda for background processing, and JWT for secure access.
