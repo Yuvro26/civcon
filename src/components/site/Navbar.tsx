@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { useAuth, logout } from "@/lib/auth";
+import { ThemeToggle } from "@/components/site/ThemeToggle";
 
 const NAV_LINKS = [
   { label: "Home", to: "/" },
