@@ -103,7 +103,7 @@ function About() {
               <div className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-primary text-primary-foreground shadow-glow">
                 <p.icon className="h-6 w-6" />
               </div>
-              <h3 className="mt-5 text-lg font-semibold">{p.title}</h3>
+              <h2 className="mt-5 text-lg font-semibold">{p.title}</h2>
               <p className="mt-2 text-sm text-muted-foreground">{p.desc}</p>
             </motion.div>
           ))}
