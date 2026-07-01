@@ -142,7 +142,7 @@ function About() {
         </div>
 
         <div className="mx-auto mt-16 max-w-6xl px-4">
-          <h3 className="text-center text-2xl font-bold">Meet the Team</h3>
+          <h2 className="text-center text-2xl font-bold">Meet the Team</h2>
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {TEAM.map((m, i) => (
               <motion.div
