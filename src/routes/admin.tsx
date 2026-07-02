@@ -2,15 +2,14 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Lock, Eye, EyeOff, ShieldCheck, ArrowRight } from "lucide-react";
+import { KeyRound, Lock, Eye, EyeOff, ShieldCheck, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
-import { validateEmail, validatePassword } from "@/lib/auth";
-import { ensureAdmin, checkAdminExists } from "@/lib/auth.functions";
+import { ensureAdminAccount, verifyAdminCode } from "@/lib/auth.functions";
 
 
 export const Route = createFileRoute("/admin")({
@@ -19,47 +18,36 @@ export const Route = createFileRoute("/admin")({
 
 function AdminAuth() {
   const navigate = useNavigate();
-  const doEnsureAdmin = useServerFn(ensureAdmin);
-  const doCheckAdminExists = useServerFn(checkAdminExists);
-  const [hasAdmin, setHasAdmin] = useState(false);
+  const doEnsureAdmin = useServerFn(ensureAdminAccount);
+  const doVerifyCode = useServerFn(verifyAdminCode);
   const [showPassword, setShowPassword] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-
+  // Make sure the single admin account exists so the credentials always work.
   useEffect(() => {
-    doCheckAdminExists()
-      .then((r) => setHasAdmin(r.exists))
-      .catch(() => setHasAdmin(false));
-  }, [doCheckAdminExists]);
+    doEnsureAdmin().catch(() => undefined);
+  }, [doEnsureAdmin]);
 
-  async function handleAdmin(email: string, password: string) {
-    const emailErr = validateEmail(email);
-    if (emailErr) return toast.error(emailErr);
-    const passErr = validatePassword(password);
-    if (passErr) return toast.error(passErr);
+  async function handleAdmin(code: string, password: string) {
+    if (!code.trim()) return toast.error("Admin access code is required.");
+    if (!password) return toast.error("Password is required.");
 
+    setBusy(true);
     try {
-      // Try to sign in with the existing account.
-      let signInError = (await supabase.auth.signInWithPassword({ email, password })).error;
+      // Ensure the account is provisioned, then validate the secret code.
+      await doEnsureAdmin().catch(() => undefined);
 
-      // If sign-in fails and no admin exists yet, create the first admin account.
-      if (signInError && !hasAdmin) {
-        const { error: signUpError } = await supabase.auth.signUp({ email, password });
-        if (signUpError && !/already|registered|exists/i.test(signUpError.message)) {
-          toast.error(signUpError.message);
-          return;
-        }
-        signInError = (await supabase.auth.signInWithPassword({ email, password })).error;
-      }
-
-      if (signInError) {
-        toast.error("Invalid admin credentials.");
+      let email: string;
+      try {
+        ({ email } = await doVerifyCode({ data: { code } }));
+      } catch {
+        toast.error("Invalid admin access code.");
         return;
       }
 
-      const { admin } = await doEnsureAdmin();
-      if (!admin) {
-        await supabase.auth.signOut();
-        toast.error("You are not authorized as an administrator.");
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        toast.error("Invalid admin password.");
         return;
       }
 
@@ -67,6 +55,8 @@ function AdminAuth() {
       setTimeout(() => navigate({ to: "/admin-dashboard" }), 600);
     } catch {
       toast.error("Something went wrong. Please try again.");
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -88,9 +78,7 @@ function AdminAuth() {
           </div>
           <h1 className="mt-2 text-center text-2xl font-bold">Admin Login</h1>
           <p className="mt-1 text-center text-sm text-muted-foreground">
-            {hasAdmin
-              ? "Restricted access for the registered administrator."
-              : "First login here becomes the administrator."}
+            Enter your secret access code and password. No email required.
           </p>
 
           <form
@@ -98,16 +86,24 @@ function AdminAuth() {
             onSubmit={async (e) => {
               e.preventDefault();
               const form = e.currentTarget;
-              const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+              const code = (form.elements.namedItem("code") as HTMLInputElement).value;
               const password = (form.elements.namedItem("password") as HTMLInputElement).value;
-              await handleAdmin(email, password);
+              await handleAdmin(code, password);
             }}
           >
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="code">Admin Access Code</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input id="email" name="email" type="email" placeholder="admin@city.gov" className="pl-9" required />
+                <KeyRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="code"
+                  name="code"
+                  type="text"
+                  autoComplete="off"
+                  placeholder="CIVIC-ADMIN-XXXX"
+                  className="pl-9 uppercase tracking-wide"
+                  required
+                />
               </div>
             </div>
             <div className="space-y-1.5">
@@ -132,14 +128,14 @@ function AdminAuth() {
                 </button>
               </div>
             </div>
-            <Button type="submit" variant="hero" size="lg" className="w-full">
-              {hasAdmin ? "Login as Admin" : "Register as Admin"} <ArrowRight className="h-4 w-4" />
+            <Button type="submit" variant="hero" size="lg" className="w-full" disabled={busy}>
+              {busy ? "Verifying…" : "Login as Admin"} <ArrowRight className="h-4 w-4" />
             </Button>
           </form>
 
           <div className="mt-6 rounded-xl border border-border/60 bg-secondary/40 p-3 text-center text-xs text-muted-foreground">
-            Only one administrator account can be registered. The first person to log in here
-            becomes the admin, and those credentials are locked in for all future logins.
+            Admin access is restricted to a single secret code. Keep your access code and
+            password private — anyone with both can manage all reports.
           </div>
 
         </motion.div>
