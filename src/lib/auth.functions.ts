@@ -1,45 +1,69 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /**
- * Admin management server functions.
- * The first authenticated user to claim admin (when none exists) becomes the
- * administrator. Afterwards only existing admins pass.
+ * Admin access is code-based. There is a single administrator account backed
+ * by a fixed internal email (never shown in the UI). The admin signs in with a
+ * secret Access Code + password instead of an email address.
+ *
+ * - ADMIN_EMAIL      internal identity used to create the Supabase auth session
+ * - ADMIN_CODE       the secret code only the administrator knows
+ * - ADMIN_PASSWORD   the initial password set when the account is provisioned
  */
+const ADMIN_EMAIL = "admin@civicconnect.app";
+const ADMIN_CODE = "CIVIC-ADMIN-2026";
+const ADMIN_PASSWORD = "CivicConnect@2026";
 
-// Whether an administrator has already been registered (public, boolean only).
-export const checkAdminExists = createServerFn({ method: "GET" }).handler(
-  async (): Promise<{ exists: boolean }> => {
+// Make sure the single administrator account exists and holds the admin role.
+// Idempotent: if the account already exists its password is left untouched.
+export const ensureAdminAccount = createServerFn({ method: "POST" }).handler(
+  async (): Promise<{ ready: boolean }> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { count, error } = await supabaseAdmin
+
+    // Resolve the admin auth user (create if missing).
+    let userId: string | undefined;
+    const { data: created, error: createErr } = await supabaseAdmin.auth.admin.createUser({
+      email: ADMIN_EMAIL,
+      password: ADMIN_PASSWORD,
+      email_confirm: true,
+    });
+
+    if (created?.user?.id) {
+      userId = created.user.id;
+    } else if (createErr) {
+      // Already exists — look up the id from the profiles table.
+      const { data: prof } = await supabaseAdmin
+        .from("profiles")
+        .select("id")
+        .eq("email", ADMIN_EMAIL)
+        .maybeSingle();
+      userId = prof?.id;
+    }
+
+    if (!userId) return { ready: false };
+
+    // Ensure the admin role is granted (ignore duplicate errors).
+    const { data: existingRole } = await supabaseAdmin
       .from("user_roles")
-      .select("*", { count: "exact", head: true })
-      .eq("role", "admin");
-    if (error) throw error;
-    return { exists: (count ?? 0) > 0 };
+      .select("id")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (!existingRole) {
+      await supabaseAdmin.from("user_roles").insert({ user_id: userId, role: "admin" });
+    }
+
+    return { ready: true };
   },
 );
 
-// Grant admin to the current user if none exists yet; otherwise verify.
-export const ensureAdmin = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ admin: boolean }> => {
-    const { userId } = context;
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const { data: admins, error } = await supabaseAdmin
-      .from("user_roles")
-      .select("user_id")
-      .eq("role", "admin");
-    if (error) throw error;
-
-    if (!admins || admins.length === 0) {
-      const { error: insErr } = await supabaseAdmin
-        .from("user_roles")
-        .insert({ user_id: userId, role: "admin" });
-      if (insErr) throw insErr;
-      return { admin: true };
+// Verify the secret admin access code and return the internal login email.
+// The password (checked by Supabase during sign-in) is the real secret.
+export const verifyAdminCode = createServerFn({ method: "POST" })
+  .inputValidator((data: { code: string }) => data)
+  .handler(async ({ data }): Promise<{ email: string }> => {
+    if ((data.code ?? "").trim().toUpperCase() !== ADMIN_CODE) {
+      throw new Error("Invalid admin access code.");
     }
-
-    return { admin: admins.some((a) => a.user_id === userId) };
+    return { email: ADMIN_EMAIL };
   });
