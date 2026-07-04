@@ -26,6 +26,11 @@ import { Route as AdminDashboardRouteImport } from './routes/admin-dashboard'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminDashboardIndexRouteImport } from './routes/admin-dashboard.index'
+import { Route as AdminDashboardUsersRouteImport } from './routes/admin-dashboard.users'
+import { Route as AdminDashboardOfficersRouteImport } from './routes/admin-dashboard.officers'
+import { Route as AdminDashboardComplaintsRouteImport } from './routes/admin-dashboard.complaints'
+import { Route as AdminDashboardAnalyticsRouteImport } from './routes/admin-dashboard.analytics'
 
 const WorksRoute = WorksRouteImport.update({
   id: '/works',
@@ -112,12 +117,38 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminDashboardRoute,
+} as any)
+const AdminDashboardUsersRoute = AdminDashboardUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminDashboardRoute,
+} as any)
+const AdminDashboardOfficersRoute = AdminDashboardOfficersRouteImport.update({
+  id: '/officers',
+  path: '/officers',
+  getParentRoute: () => AdminDashboardRoute,
+} as any)
+const AdminDashboardComplaintsRoute =
+  AdminDashboardComplaintsRouteImport.update({
+    id: '/complaints',
+    path: '/complaints',
+    getParentRoute: () => AdminDashboardRoute,
+  } as any)
+const AdminDashboardAnalyticsRoute = AdminDashboardAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminDashboardRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
-  '/admin-dashboard': typeof AdminDashboardRoute
+  '/admin-dashboard': typeof AdminDashboardRouteWithChildren
   '/analytics': typeof AnalyticsRoute
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
@@ -131,12 +162,16 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
+  '/admin-dashboard/analytics': typeof AdminDashboardAnalyticsRoute
+  '/admin-dashboard/complaints': typeof AdminDashboardComplaintsRoute
+  '/admin-dashboard/officers': typeof AdminDashboardOfficersRoute
+  '/admin-dashboard/users': typeof AdminDashboardUsersRoute
+  '/admin-dashboard/': typeof AdminDashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
-  '/admin-dashboard': typeof AdminDashboardRoute
   '/analytics': typeof AnalyticsRoute
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
@@ -150,13 +185,18 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
+  '/admin-dashboard/analytics': typeof AdminDashboardAnalyticsRoute
+  '/admin-dashboard/complaints': typeof AdminDashboardComplaintsRoute
+  '/admin-dashboard/officers': typeof AdminDashboardOfficersRoute
+  '/admin-dashboard/users': typeof AdminDashboardUsersRoute
+  '/admin-dashboard': typeof AdminDashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
-  '/admin-dashboard': typeof AdminDashboardRoute
+  '/admin-dashboard': typeof AdminDashboardRouteWithChildren
   '/analytics': typeof AnalyticsRoute
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
@@ -170,6 +210,11 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
+  '/admin-dashboard/analytics': typeof AdminDashboardAnalyticsRoute
+  '/admin-dashboard/complaints': typeof AdminDashboardComplaintsRoute
+  '/admin-dashboard/officers': typeof AdminDashboardOfficersRoute
+  '/admin-dashboard/users': typeof AdminDashboardUsersRoute
+  '/admin-dashboard/': typeof AdminDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -191,12 +236,16 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track'
     | '/works'
+    | '/admin-dashboard/analytics'
+    | '/admin-dashboard/complaints'
+    | '/admin-dashboard/officers'
+    | '/admin-dashboard/users'
+    | '/admin-dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/admin'
-    | '/admin-dashboard'
     | '/analytics'
     | '/community'
     | '/contact'
@@ -210,6 +259,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track'
     | '/works'
+    | '/admin-dashboard/analytics'
+    | '/admin-dashboard/complaints'
+    | '/admin-dashboard/officers'
+    | '/admin-dashboard/users'
+    | '/admin-dashboard'
   id:
     | '__root__'
     | '/'
@@ -229,13 +283,18 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track'
     | '/works'
+    | '/admin-dashboard/analytics'
+    | '/admin-dashboard/complaints'
+    | '/admin-dashboard/officers'
+    | '/admin-dashboard/users'
+    | '/admin-dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
-  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminDashboardRoute: typeof AdminDashboardRouteWithChildren
   AnalyticsRoute: typeof AnalyticsRoute
   CommunityRoute: typeof CommunityRoute
   ContactRoute: typeof ContactRoute
@@ -372,14 +431,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin-dashboard/': {
+      id: '/admin-dashboard/'
+      path: '/'
+      fullPath: '/admin-dashboard/'
+      preLoaderRoute: typeof AdminDashboardIndexRouteImport
+      parentRoute: typeof AdminDashboardRoute
+    }
+    '/admin-dashboard/users': {
+      id: '/admin-dashboard/users'
+      path: '/users'
+      fullPath: '/admin-dashboard/users'
+      preLoaderRoute: typeof AdminDashboardUsersRouteImport
+      parentRoute: typeof AdminDashboardRoute
+    }
+    '/admin-dashboard/officers': {
+      id: '/admin-dashboard/officers'
+      path: '/officers'
+      fullPath: '/admin-dashboard/officers'
+      preLoaderRoute: typeof AdminDashboardOfficersRouteImport
+      parentRoute: typeof AdminDashboardRoute
+    }
+    '/admin-dashboard/complaints': {
+      id: '/admin-dashboard/complaints'
+      path: '/complaints'
+      fullPath: '/admin-dashboard/complaints'
+      preLoaderRoute: typeof AdminDashboardComplaintsRouteImport
+      parentRoute: typeof AdminDashboardRoute
+    }
+    '/admin-dashboard/analytics': {
+      id: '/admin-dashboard/analytics'
+      path: '/analytics'
+      fullPath: '/admin-dashboard/analytics'
+      preLoaderRoute: typeof AdminDashboardAnalyticsRouteImport
+      parentRoute: typeof AdminDashboardRoute
+    }
   }
 }
+
+interface AdminDashboardRouteChildren {
+  AdminDashboardAnalyticsRoute: typeof AdminDashboardAnalyticsRoute
+  AdminDashboardComplaintsRoute: typeof AdminDashboardComplaintsRoute
+  AdminDashboardOfficersRoute: typeof AdminDashboardOfficersRoute
+  AdminDashboardUsersRoute: typeof AdminDashboardUsersRoute
+  AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
+}
+
+const AdminDashboardRouteChildren: AdminDashboardRouteChildren = {
+  AdminDashboardAnalyticsRoute: AdminDashboardAnalyticsRoute,
+  AdminDashboardComplaintsRoute: AdminDashboardComplaintsRoute,
+  AdminDashboardOfficersRoute: AdminDashboardOfficersRoute,
+  AdminDashboardUsersRoute: AdminDashboardUsersRoute,
+  AdminDashboardIndexRoute: AdminDashboardIndexRoute,
+}
+
+const AdminDashboardRouteWithChildren = AdminDashboardRoute._addFileChildren(
+  AdminDashboardRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
-  AdminDashboardRoute: AdminDashboardRoute,
+  AdminDashboardRoute: AdminDashboardRouteWithChildren,
   AnalyticsRoute: AnalyticsRoute,
   CommunityRoute: CommunityRoute,
   ContactRoute: ContactRoute,
@@ -397,13 +511,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

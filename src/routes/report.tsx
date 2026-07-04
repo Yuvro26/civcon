@@ -11,6 +11,7 @@ import {
   FileText,
   RotateCw,
   CheckCircle2,
+  ShieldOff,
 } from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
@@ -19,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -62,6 +64,7 @@ function ReportIssue() {
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   const [files, setFiles] = useState<SelectedFile[]>([]);
   const [dragActive, setDragActive] = useState(false);
@@ -171,6 +174,7 @@ function ReportIssue() {
     setPriority("Medium");
     setDescription("");
     setLocation("");
+    setIsAnonymous(false);
     setFiles([]);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -195,7 +199,7 @@ function ReportIssue() {
     setSubmitting(true);
     try {
       const issue = await createIssue(
-        { title, category, priority, description, location },
+        { title, category, priority, description, location, isAnonymous },
         attachments,
       );
 
@@ -405,6 +409,21 @@ function ReportIssue() {
             )}
           </div>
 
+          <div className="flex items-start justify-between gap-4 rounded-xl border border-border bg-secondary/30 p-4">
+            <div className="flex gap-3">
+              <ShieldOff className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+              <div>
+                <Label htmlFor="anon" className="cursor-pointer text-sm font-semibold">
+                  Report Anonymously
+                </Label>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Your name stays hidden from officers and the public. Only the city administrator
+                  can see who filed the report.
+                </p>
+              </div>
+            </div>
+            <Switch id="anon" checked={isAnonymous} onCheckedChange={setIsAnonymous} />
+          </div>
 
           <Button type="submit" variant="hero" size="lg" className="w-full" disabled={busy}>
             {busy ? (

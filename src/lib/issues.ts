@@ -34,6 +34,8 @@ export interface IssueRow {
   image_url: string | null;
   attachments: Attachment[];
   status: IssueStatus;
+  assigned_officer_id: string | null;
+  is_anonymous: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -52,6 +54,7 @@ export interface NewIssueInput {
   priority: IssuePriority;
   description: string;
   location: string;
+  isAnonymous?: boolean;
 }
 
 // Normalize a DB row (attachments comes back as Json) into a typed IssueRow.
@@ -182,6 +185,7 @@ export async function createIssue(
       location: input.location.trim() || null,
       image_url: firstImage?.path ?? null,
       attachments: attachments as unknown as never,
+      is_anonymous: input.isAnonymous ?? false,
     })
     .select()
     .single();
