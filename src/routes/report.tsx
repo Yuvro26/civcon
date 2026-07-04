@@ -405,6 +405,21 @@ function ReportIssue() {
             )}
           </div>
 
+          <div className="flex items-start justify-between gap-4 rounded-xl border border-border bg-secondary/30 p-4">
+            <div className="flex gap-3">
+              <ShieldOff className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+              <div>
+                <Label htmlFor="anon" className="cursor-pointer text-sm font-semibold">
+                  Report Anonymously
+                </Label>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Your name stays hidden from officers and the public. Only the city administrator
+                  can see who filed the report.
+                </p>
+              </div>
+            </div>
+            <Switch id="anon" checked={isAnonymous} onCheckedChange={setIsAnonymous} />
+          </div>
 
           <Button type="submit" variant="hero" size="lg" className="w-full" disabled={busy}>
             {busy ? (
