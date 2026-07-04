@@ -11,6 +11,7 @@ import {
   FileText,
   RotateCw,
   CheckCircle2,
+  ShieldOff,
 } from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout, PageHeader } from "@/components/site/SiteLayout";
@@ -19,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -62,6 +64,7 @@ function ReportIssue() {
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   const [files, setFiles] = useState<SelectedFile[]>([]);
   const [dragActive, setDragActive] = useState(false);
@@ -171,6 +174,7 @@ function ReportIssue() {
     setPriority("Medium");
     setDescription("");
     setLocation("");
+    setIsAnonymous(false);
     setFiles([]);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -195,7 +199,7 @@ function ReportIssue() {
     setSubmitting(true);
     try {
       const issue = await createIssue(
-        { title, category, priority, description, location },
+        { title, category, priority, description, location, isAnonymous },
         attachments,
       );
 
