@@ -185,6 +185,7 @@ export async function createIssue(
       location: input.location.trim() || null,
       image_url: firstImage?.path ?? null,
       attachments: attachments as unknown as never,
+      is_anonymous: input.isAnonymous ?? false,
     })
     .select()
     .single();
