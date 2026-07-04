@@ -44,14 +44,90 @@ export type Database = {
         }
         Relationships: []
       }
+      issue_assignments: {
+        Row: {
+          assigned_by: string | null
+          created_at: string
+          id: string
+          issue_id: string
+          note: string | null
+          staff_id: string | null
+        }
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          issue_id: string
+          note?: string | null
+          staff_id?: string | null
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          issue_id?: string
+          note?: string | null
+          staff_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "issue_assignments_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "issues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "issue_assignments_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      issue_notes: {
+        Row: {
+          author_id: string | null
+          created_at: string
+          id: string
+          issue_id: string
+          note: string
+        }
+        Insert: {
+          author_id?: string | null
+          created_at?: string
+          id?: string
+          issue_id: string
+          note: string
+        }
+        Update: {
+          author_id?: string | null
+          created_at?: string
+          id?: string
+          issue_id?: string
+          note?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "issue_notes_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "issues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       issues: {
         Row: {
+          assigned_officer_id: string | null
           attachments: Json
           category: string
           created_at: string
           description: string
           id: string
           image_url: string | null
+          is_anonymous: boolean
           location: string | null
           priority: string
           status: string
@@ -61,12 +137,14 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assigned_officer_id?: string | null
           attachments?: Json
           category: string
           created_at?: string
           description: string
           id?: string
           image_url?: string | null
+          is_anonymous?: boolean
           location?: string | null
           priority?: string
           status?: string
@@ -76,12 +154,14 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assigned_officer_id?: string | null
           attachments?: Json
           category?: string
           created_at?: string
           description?: string
           id?: string
           image_url?: string | null
+          is_anonymous?: boolean
           location?: string | null
           priority?: string
           status?: string
@@ -90,7 +170,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "issues_assigned_officer_id_fkey"
+            columns: ["assigned_officer_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -113,6 +201,48 @@ export type Database = {
           id?: string
           mobile?: string | null
           name?: string | null
+        }
+        Relationships: []
+      }
+      staff: {
+        Row: {
+          available: boolean
+          created_at: string
+          department: string
+          designation: string
+          email: string
+          id: string
+          is_active: boolean
+          name: string
+          phone: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          available?: boolean
+          created_at?: string
+          department: string
+          designation: string
+          email: string
+          id?: string
+          is_active?: boolean
+          name: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          available?: boolean
+          created_at?: string
+          department?: string
+          designation?: string
+          email?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
