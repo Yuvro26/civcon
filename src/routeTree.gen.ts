@@ -26,6 +26,7 @@ import { Route as AdminDashboardRouteImport } from './routes/admin-dashboard'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminDashboardIndexRouteImport } from './routes/admin-dashboard.index'
 
 const WorksRoute = WorksRouteImport.update({
   id: '/works',
@@ -112,12 +113,17 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminDashboardRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
-  '/admin-dashboard': typeof AdminDashboardRoute
+  '/admin-dashboard': typeof AdminDashboardRouteWithChildren
   '/analytics': typeof AnalyticsRoute
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
@@ -131,12 +137,12 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
+  '/admin-dashboard/': typeof AdminDashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
-  '/admin-dashboard': typeof AdminDashboardRoute
   '/analytics': typeof AnalyticsRoute
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
@@ -150,13 +156,14 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
+  '/admin-dashboard': typeof AdminDashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
-  '/admin-dashboard': typeof AdminDashboardRoute
+  '/admin-dashboard': typeof AdminDashboardRouteWithChildren
   '/analytics': typeof AnalyticsRoute
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
@@ -170,6 +177,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
+  '/admin-dashboard/': typeof AdminDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -191,12 +199,12 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track'
     | '/works'
+    | '/admin-dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/admin'
-    | '/admin-dashboard'
     | '/analytics'
     | '/community'
     | '/contact'
@@ -210,6 +218,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track'
     | '/works'
+    | '/admin-dashboard'
   id:
     | '__root__'
     | '/'
@@ -229,13 +238,14 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track'
     | '/works'
+    | '/admin-dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
-  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminDashboardRoute: typeof AdminDashboardRouteWithChildren
   AnalyticsRoute: typeof AnalyticsRoute
   CommunityRoute: typeof CommunityRoute
   ContactRoute: typeof ContactRoute
@@ -372,14 +382,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin-dashboard/': {
+      id: '/admin-dashboard/'
+      path: '/'
+      fullPath: '/admin-dashboard/'
+      preLoaderRoute: typeof AdminDashboardIndexRouteImport
+      parentRoute: typeof AdminDashboardRoute
+    }
   }
 }
+
+interface AdminDashboardRouteChildren {
+  AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
+}
+
+const AdminDashboardRouteChildren: AdminDashboardRouteChildren = {
+  AdminDashboardIndexRoute: AdminDashboardIndexRoute,
+}
+
+const AdminDashboardRouteWithChildren = AdminDashboardRoute._addFileChildren(
+  AdminDashboardRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
-  AdminDashboardRoute: AdminDashboardRoute,
+  AdminDashboardRoute: AdminDashboardRouteWithChildren,
   AnalyticsRoute: AnalyticsRoute,
   CommunityRoute: CommunityRoute,
   ContactRoute: ContactRoute,
