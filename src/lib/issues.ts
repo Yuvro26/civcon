@@ -34,6 +34,8 @@ export interface IssueRow {
   image_url: string | null;
   attachments: Attachment[];
   status: IssueStatus;
+  assigned_officer_id: string | null;
+  is_anonymous: boolean;
   created_at: string;
   updated_at: string;
 }
