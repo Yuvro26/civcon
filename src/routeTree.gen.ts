@@ -27,6 +27,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminDashboardIndexRouteImport } from './routes/admin-dashboard.index'
+import { Route as AdminDashboardComplaintsRouteImport } from './routes/admin-dashboard.complaints'
 
 const WorksRoute = WorksRouteImport.update({
   id: '/works',
@@ -118,6 +119,12 @@ const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminDashboardRoute,
 } as any)
+const AdminDashboardComplaintsRoute =
+  AdminDashboardComplaintsRouteImport.update({
+    id: '/complaints',
+    path: '/complaints',
+    getParentRoute: () => AdminDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
+  '/admin-dashboard/complaints': typeof AdminDashboardComplaintsRoute
   '/admin-dashboard/': typeof AdminDashboardIndexRoute
 }
 export interface FileRoutesByTo {
@@ -156,6 +164,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
+  '/admin-dashboard/complaints': typeof AdminDashboardComplaintsRoute
   '/admin-dashboard': typeof AdminDashboardIndexRoute
 }
 export interface FileRoutesById {
@@ -177,6 +186,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
+  '/admin-dashboard/complaints': typeof AdminDashboardComplaintsRoute
   '/admin-dashboard/': typeof AdminDashboardIndexRoute
 }
 export interface FileRouteTypes {
@@ -199,6 +209,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track'
     | '/works'
+    | '/admin-dashboard/complaints'
     | '/admin-dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -218,6 +229,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track'
     | '/works'
+    | '/admin-dashboard/complaints'
     | '/admin-dashboard'
   id:
     | '__root__'
@@ -238,6 +250,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/track'
     | '/works'
+    | '/admin-dashboard/complaints'
     | '/admin-dashboard/'
   fileRoutesById: FileRoutesById
 }
@@ -389,14 +402,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardIndexRouteImport
       parentRoute: typeof AdminDashboardRoute
     }
+    '/admin-dashboard/complaints': {
+      id: '/admin-dashboard/complaints'
+      path: '/complaints'
+      fullPath: '/admin-dashboard/complaints'
+      preLoaderRoute: typeof AdminDashboardComplaintsRouteImport
+      parentRoute: typeof AdminDashboardRoute
+    }
   }
 }
 
 interface AdminDashboardRouteChildren {
+  AdminDashboardComplaintsRoute: typeof AdminDashboardComplaintsRoute
   AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
 }
 
 const AdminDashboardRouteChildren: AdminDashboardRouteChildren = {
+  AdminDashboardComplaintsRoute: AdminDashboardComplaintsRoute,
   AdminDashboardIndexRoute: AdminDashboardIndexRoute,
 }
 
