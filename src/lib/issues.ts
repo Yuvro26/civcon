@@ -54,6 +54,7 @@ export interface NewIssueInput {
   priority: IssuePriority;
   description: string;
   location: string;
+  isAnonymous?: boolean;
 }
 
 // Normalize a DB row (attachments comes back as Json) into a typed IssueRow.
