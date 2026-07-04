@@ -27,6 +27,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminDashboardIndexRouteImport } from './routes/admin-dashboard.index'
+import { Route as AdminDashboardOfficersRouteImport } from './routes/admin-dashboard.officers'
 import { Route as AdminDashboardComplaintsRouteImport } from './routes/admin-dashboard.complaints'
 
 const WorksRoute = WorksRouteImport.update({
@@ -119,6 +120,11 @@ const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminDashboardRoute,
 } as any)
+const AdminDashboardOfficersRoute = AdminDashboardOfficersRouteImport.update({
+  id: '/officers',
+  path: '/officers',
+  getParentRoute: () => AdminDashboardRoute,
+} as any)
 const AdminDashboardComplaintsRoute =
   AdminDashboardComplaintsRouteImport.update({
     id: '/complaints',
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
   '/admin-dashboard/complaints': typeof AdminDashboardComplaintsRoute
+  '/admin-dashboard/officers': typeof AdminDashboardOfficersRoute
   '/admin-dashboard/': typeof AdminDashboardIndexRoute
 }
 export interface FileRoutesByTo {
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
   '/admin-dashboard/complaints': typeof AdminDashboardComplaintsRoute
+  '/admin-dashboard/officers': typeof AdminDashboardOfficersRoute
   '/admin-dashboard': typeof AdminDashboardIndexRoute
 }
 export interface FileRoutesById {
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/track': typeof TrackRoute
   '/works': typeof WorksRoute
   '/admin-dashboard/complaints': typeof AdminDashboardComplaintsRoute
+  '/admin-dashboard/officers': typeof AdminDashboardOfficersRoute
   '/admin-dashboard/': typeof AdminDashboardIndexRoute
 }
 export interface FileRouteTypes {
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/track'
     | '/works'
     | '/admin-dashboard/complaints'
+    | '/admin-dashboard/officers'
     | '/admin-dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/track'
     | '/works'
     | '/admin-dashboard/complaints'
+    | '/admin-dashboard/officers'
     | '/admin-dashboard'
   id:
     | '__root__'
@@ -251,6 +262,7 @@ export interface FileRouteTypes {
     | '/track'
     | '/works'
     | '/admin-dashboard/complaints'
+    | '/admin-dashboard/officers'
     | '/admin-dashboard/'
   fileRoutesById: FileRoutesById
 }
@@ -402,6 +414,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardIndexRouteImport
       parentRoute: typeof AdminDashboardRoute
     }
+    '/admin-dashboard/officers': {
+      id: '/admin-dashboard/officers'
+      path: '/officers'
+      fullPath: '/admin-dashboard/officers'
+      preLoaderRoute: typeof AdminDashboardOfficersRouteImport
+      parentRoute: typeof AdminDashboardRoute
+    }
     '/admin-dashboard/complaints': {
       id: '/admin-dashboard/complaints'
       path: '/complaints'
@@ -414,11 +433,13 @@ declare module '@tanstack/react-router' {
 
 interface AdminDashboardRouteChildren {
   AdminDashboardComplaintsRoute: typeof AdminDashboardComplaintsRoute
+  AdminDashboardOfficersRoute: typeof AdminDashboardOfficersRoute
   AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
 }
 
 const AdminDashboardRouteChildren: AdminDashboardRouteChildren = {
   AdminDashboardComplaintsRoute: AdminDashboardComplaintsRoute,
+  AdminDashboardOfficersRoute: AdminDashboardOfficersRoute,
   AdminDashboardIndexRoute: AdminDashboardIndexRoute,
 }
 
