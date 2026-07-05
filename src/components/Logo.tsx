@@ -3,12 +3,14 @@ import { Link } from "@tanstack/react-router";
 export function Logo({
   className = "",
   showText = true,
+  to = "/",
 }: {
   className?: string;
   showText?: boolean;
+  to?: string;
 }) {
   return (
-    <Link to="/" className={`flex items-center gap-2.5 ${className}`}>
+    <Link to={to} className={`flex items-center gap-2.5 ${className}`}>
       <span className="relative inline-flex h-10 w-10 items-center justify-center">
         <svg
           viewBox="0 0 48 48"
