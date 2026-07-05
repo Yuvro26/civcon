@@ -105,7 +105,7 @@ function Shell() {
       {/* Desktop sidebar */}
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-border bg-sidebar p-4 lg:flex">
         <div className="px-2 py-2">
-          <Logo />
+          <Logo to="/admin-dashboard" />
         </div>
         {navList}
         <Button variant="ghost" className="justify-start text-muted-foreground" onClick={handleSignOut}>
