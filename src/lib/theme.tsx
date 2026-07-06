@@ -13,8 +13,19 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 function applyTheme(theme: Theme) {
   const root = document.documentElement;
   root.classList.toggle("light", theme === "light");
-  // Enable transitions only after the first paint to avoid a flash on load.
-  root.classList.add("theme-ready");
+}
+
+// Enable transitions only for the brief moment of a manual theme switch,
+// then remove them so they never affect scrolling/hover during normal use.
+let transitionTimer: ReturnType<typeof setTimeout> | undefined;
+function runThemeTransition(apply: () => void) {
+  const root = document.documentElement;
+  root.classList.add("theme-transition");
+  apply();
+  if (transitionTimer) clearTimeout(transitionTimer);
+  transitionTimer = setTimeout(() => {
+    root.classList.remove("theme-transition");
+  }, 350);
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -35,7 +46,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const toggleTheme = () => {
     setTheme((prev) => {
       const next: Theme = prev === "dark" ? "light" : "dark";
-      applyTheme(next);
+      runThemeTransition(() => applyTheme(next));
       try {
         localStorage.setItem(STORAGE_KEY, next);
       } catch {
