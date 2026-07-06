@@ -18,6 +18,7 @@ export interface StaffRow {
   phone: string | null;
   department: string;
   designation: string;
+  avatar_url: string | null;
   is_active: boolean;
   available: boolean;
   created_at: string;
