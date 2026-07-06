@@ -88,14 +88,25 @@ export function InitialsAvatar({
   name,
   size = "md",
   seed,
+  src,
 }: {
   name?: string | null;
   size?: "sm" | "md" | "lg";
   seed?: string;
+  src?: string | null;
 }) {
   const key = (seed ?? name ?? "?").split("").reduce((a, c) => a + c.charCodeAt(0), 0);
   const color = AVATAR_COLORS[key % AVATAR_COLORS.length];
   const dim = size === "lg" ? "h-16 w-16 text-xl" : size === "sm" ? "h-8 w-8 text-xs" : "h-10 w-10 text-sm";
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={name ?? "Avatar"}
+        className={cn("shrink-0 rounded-full object-cover", dim)}
+      />
+    );
+  }
   return (
     <span
       className={cn(
@@ -108,6 +119,7 @@ export function InitialsAvatar({
     </span>
   );
 }
+
 
 // ---- Empty state -----------------------------------------------------------
 export function EmptyState({
