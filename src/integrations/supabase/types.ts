@@ -207,6 +207,7 @@ export type Database = {
       staff: {
         Row: {
           available: boolean
+          avatar_url: string | null
           created_at: string
           department: string
           designation: string
@@ -220,6 +221,7 @@ export type Database = {
         }
         Insert: {
           available?: boolean
+          avatar_url?: string | null
           created_at?: string
           department: string
           designation: string
@@ -233,6 +235,7 @@ export type Database = {
         }
         Update: {
           available?: boolean
+          avatar_url?: string | null
           created_at?: string
           department?: string
           designation?: string
