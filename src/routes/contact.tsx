@@ -169,16 +169,24 @@ function Contact() {
                 </div>
               </a>
             ))}
-            <a
-              href={MAPS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="glass-card grid h-44 place-items-center rounded-2xl text-sm text-muted-foreground transition-colors hover:border-primary/40"
-            >
-              <span className="flex items-center gap-2">
+            <div className="glass-card overflow-hidden rounded-2xl">
+              <iframe
+                title="Magicbus Center, Thane"
+                src={`https://maps.google.com/maps?q=${encodeURIComponent("Magicbus Center, Thane")}&output=embed`}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="h-44 w-full border-0"
+              />
+              <a
+                href={MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 border-t border-border p-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
                 <MapPin className="h-4 w-4" /> Magicbus Center, Thane
-              </span>
-            </a>
+              </a>
+            </div>
+
           </div>
 
 
