@@ -20,6 +20,7 @@ function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [ready, setReady] = useState(false);
+  const [password, setPassword] = useState("");
 
   // A recovery link establishes a temporary session via the URL hash.
   useEffect(() => {
