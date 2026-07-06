@@ -73,10 +73,10 @@ const STACK = [
   "AWS S3 / SNS / Lambda",
 ];
 
-const TEAM = [
-  { name: "Yashraj Gaikwad", role: "Team Member", photo: "https://i.pravatar.cc/150?u=yashraj.gaikwad" },
-  { name: "Priyam Rai", role: "Team Member", photo: "https://i.pravatar.cc/150?u=priyam.rai" },
-  { name: "Karina Prajapati", role: "Team Member", photo: "https://i.pravatar.cc/150?u=karina.prajapati" },
+const TEAM: { name: string; role: string; photo?: string }[] = [
+  { name: "Yashraj Gaikwad", role: "Founder & Lead" },
+  { name: "Priyam Rai", role: "Design & UX" },
+  { name: "Karina Prajapati", role: "Database & Backend Support" },
 ];
 
 function About() {
