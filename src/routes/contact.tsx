@@ -172,7 +172,7 @@ function Contact() {
             <div className="glass-card overflow-hidden rounded-2xl">
               <iframe
                 title="Magicbus Center, Thane"
-                src={`https://maps.google.com/maps?q=${encodeURIComponent("Magicbus Center, Thane")}&output=embed`}
+                src={`https://www.google.com/maps?q=${encodeURIComponent("Magicbus Center, Thane")}&output=embed`}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 className="h-44 w-full border-0"
