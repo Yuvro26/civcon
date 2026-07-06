@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Logo } from "@/components/Logo";
+import ccLogo from "@/assets/cc-logo.png.asset.json";
 
 export function SplashScreen() {
   return (
