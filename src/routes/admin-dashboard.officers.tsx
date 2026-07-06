@@ -139,7 +139,7 @@ function Officers() {
           {staff.map((s) => (
             <div key={s.id} className="glass-card flex flex-col gap-4 rounded-2xl p-5">
               <div className="flex items-start gap-3">
-                <InitialsAvatar name={s.name} size="lg" seed={s.id} />
+                <InitialsAvatar name={s.name} size="lg" seed={s.id} src={s.avatar_url} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="truncate font-semibold">{s.name}</h3>
