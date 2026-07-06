@@ -138,6 +138,15 @@ function AdminAuth() {
             password private — anyone with both can manage all reports.
           </div>
 
+          <div className="mt-4 text-center">
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/login">
+                <ArrowLeft className="h-4 w-4" /> Back to user login
+              </Link>
+            </Button>
+          </div>
+
+
         </motion.div>
       </div>
     </div>
