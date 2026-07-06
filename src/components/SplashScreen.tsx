@@ -16,7 +16,7 @@ export function SplashScreen() {
         <div className="relative flex items-center justify-center">
           {/* Rotating gradient ring */}
           <motion.div
-            className="absolute h-44 w-44 rounded-full border-2 border-transparent"
+            className="absolute h-52 w-52 rounded-full border-2 border-transparent"
             style={{
               background:
                 "conic-gradient(from 0deg, transparent 0deg, oklch(0.74 0.16 210) 120deg, oklch(0.62 0.2 285) 240deg, transparent 360deg)",
