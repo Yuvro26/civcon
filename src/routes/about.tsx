@@ -74,10 +74,9 @@ const STACK = [
 ];
 
 const TEAM = [
-  { name: "Aarav Sharma", role: "Founder & Product" },
-  { name: "Priya Nair", role: "Engineering Lead" },
-  { name: "Rohan Mehta", role: "Design & UX" },
-  { name: "Sneha Kapoor", role: "Civic Partnerships" },
+  { name: "Yashraj Gaikwad", role: "Team Member", photo: "https://i.pravatar.cc/150?u=yashraj.gaikwad" },
+  { name: "Priyam Rai", role: "Team Member", photo: "https://i.pravatar.cc/150?u=priyam.rai" },
+  { name: "Karina Prajapati", role: "Team Member", photo: "https://i.pravatar.cc/150?u=karina.prajapati" },
 ];
 
 function About() {
@@ -143,7 +142,7 @@ function About() {
 
         <div className="mx-auto mt-16 max-w-6xl px-4">
           <h2 className="text-center text-2xl font-bold">Meet the Team</h2>
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {TEAM.map((m, i) => (
               <motion.div
                 key={m.name}
@@ -153,14 +152,23 @@ function About() {
                 transition={{ delay: i * 0.06 }}
                 className="glass-card rounded-2xl p-6 text-center"
               >
-                <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-gradient-primary text-xl font-bold text-primary-foreground">
-                  {m.name.charAt(0)}
-                </div>
+                {m.photo ? (
+                  <img
+                    src={m.photo}
+                    alt={m.name}
+                    className="mx-auto h-16 w-16 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-gradient-primary text-xl font-bold text-primary-foreground">
+                    {m.name.charAt(0)}
+                  </div>
+                )}
                 <h3 className="mt-4 font-semibold">{m.name}</h3>
                 <p className="text-xs text-muted-foreground">{m.role}</p>
               </motion.div>
             ))}
           </div>
+
         </div>
       </div>
     </SiteLayout>
