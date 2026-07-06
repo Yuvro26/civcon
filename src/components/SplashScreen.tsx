@@ -43,7 +43,7 @@ export function SplashScreen() {
 
           {/* Orbiting dot */}
           <motion.div
-            className="absolute h-44 w-44"
+            className="absolute h-52 w-52"
             animate={{ rotate: 360 }}
             transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
           >
