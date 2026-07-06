@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Logo } from "@/components/Logo";
+import ccLogo from "@/assets/cc-logo.png.asset.json";
 
 export function SplashScreen() {
   return (
@@ -28,16 +28,17 @@ export function SplashScreen() {
             transition={{ duration: 2.4, repeat: Infinity, ease: "linear" }}
           />
 
-          {/* Circular photo frame */}
+          {/* Circular logo filling the ring */}
           <motion.div
-            className="relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border border-border bg-card shadow-lg"
+            className="relative flex h-44 w-44 items-center justify-center overflow-hidden rounded-full"
             animate={{ scale: [1, 1.04, 1] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
-            <div className="absolute inset-0 bg-gradient-primary opacity-10" />
-            <div className="scale-[1.9]">
-              <Logo showText={false} />
-            </div>
+            <img
+              src={ccLogo.url}
+              alt="CivicConnect logo"
+              className="h-full w-full rounded-full object-cover"
+            />
           </motion.div>
 
           {/* Orbiting dot */}
