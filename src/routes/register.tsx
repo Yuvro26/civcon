@@ -81,7 +81,7 @@ function Register() {
                   toast.error("An account with this email already exists. Please login.");
                   return;
                 }
-                toast.success("Account created! Check your email to verify your address before logging in.");
+                toast.success("Account created! You can now log in.");
                 setTimeout(() => navigate({ to: "/login" }), 1200);
               } catch {
                 toast.error("Something went wrong. Please try again.");
