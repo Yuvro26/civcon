@@ -74,10 +74,9 @@ const STACK = [
 ];
 
 const TEAM = [
-  { name: "Aarav Sharma", role: "Founder & Product" },
-  { name: "Priya Nair", role: "Engineering Lead" },
-  { name: "Rohan Mehta", role: "Design & UX" },
-  { name: "Sneha Kapoor", role: "Civic Partnerships" },
+  { name: "Yashraj Gaikwad", role: "Team Member", photo: "https://i.pravatar.cc/150?u=yashraj.gaikwad" },
+  { name: "Priyam Rai", role: "Team Member", photo: "https://i.pravatar.cc/150?u=priyam.rai" },
+  { name: "Karina Prajapati", role: "Team Member", photo: "https://i.pravatar.cc/150?u=karina.prajapati" },
 ];
 
 function About() {
