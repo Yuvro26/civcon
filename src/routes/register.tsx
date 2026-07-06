@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
+import { PasswordStrength } from "@/components/PasswordStrength";
 import { supabase } from "@/integrations/supabase/client";
 import { validateEmail, validatePassword, validateMobile } from "@/lib/auth";
 
@@ -17,6 +18,9 @@ export const Route = createFileRoute("/register")({
 
 function Register() {
   const navigate = useNavigate();
+  const [password, setPassword] = useState("");
+
+
 
 
   return (
@@ -87,7 +91,16 @@ function Register() {
             <Field id="name" label="Full Name" icon={User} placeholder="Your name" />
             <Field id="email" label="Email" icon={Mail} type="email" placeholder="you@email.com" />
             <Field id="mobile" label="Mobile Number" icon={Phone} type="tel" placeholder="9876543210" />
-            <Field id="password" label="Password" icon={Lock} type="password" placeholder="••••••••" />
+            <Field
+              id="password"
+              label="Password"
+              icon={Lock}
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={setPassword}
+            />
+            <PasswordStrength value={password} />
             <Field
               id="confirm"
               label="Confirm Password"
@@ -118,12 +131,16 @@ function Field({
   icon: Icon,
   type = "text",
   placeholder,
+  value,
+  onChange,
 }: {
   id: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   type?: string;
   placeholder?: string;
+  value?: string;
+  onChange?: (value: string) => void;
 }) {
   const isPassword = type === "password";
   const [show, setShow] = useState(false);
@@ -138,8 +155,10 @@ function Field({
           type={inputType}
           placeholder={placeholder}
           className={isPassword ? "pl-9 pr-10" : "pl-9"}
+          {...(onChange ? { value, onChange: (e) => onChange(e.target.value) } : {})}
           required
         />
+
         {isPassword && (
           <button
             type="button"

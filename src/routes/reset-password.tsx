@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
+import { PasswordStrength } from "@/components/PasswordStrength";
 import { supabase } from "@/integrations/supabase/client";
 import { validatePassword } from "@/lib/auth";
 
@@ -19,6 +20,7 @@ function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [ready, setReady] = useState(false);
+  const [password, setPassword] = useState("");
 
   // A recovery link establishes a temporary session via the URL hash.
   useEffect(() => {
@@ -99,6 +101,8 @@ function ResetPassword() {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="pl-9 pr-10"
                   required
@@ -112,6 +116,7 @@ function ResetPassword() {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              <PasswordStrength value={password} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="confirm">Confirm password</Label>

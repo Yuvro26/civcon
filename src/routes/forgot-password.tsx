@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { useState } from "react";
-import { Mail, ArrowRight, ArrowLeft, MailCheck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Mail, ArrowRight, ArrowLeft, MailCheck, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,9 +14,39 @@ export const Route = createFileRoute("/forgot-password")({
   component: ForgotPassword,
 });
 
+const COOLDOWN = 60;
+
 function ForgotPassword() {
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [email, setEmail] = useState("");
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const t = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [cooldown]);
+
+  async function sendReset(target: string) {
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(target.trim(), {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) {
+        toast.error("Could not send reset email. Please try again.");
+        return false;
+      }
+      setCooldown(COOLDOWN);
+      return true;
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
@@ -40,9 +70,26 @@ function ForgotPassword() {
               </div>
               <h1 className="mt-4 text-center text-2xl font-bold">Check your inbox</h1>
               <p className="mt-1 text-center text-sm text-muted-foreground">
-                If an account exists for that email, we've sent a link to reset your password.
+                If an account exists for{" "}
+                <span className="font-medium text-foreground">{email}</span>, we've sent a link to
+                reset your password.
               </p>
-              <Button asChild variant="hero" size="lg" className="mt-7 w-full">
+
+              <Button
+                variant="glass"
+                size="lg"
+                className="mt-7 w-full"
+                disabled={busy || cooldown > 0}
+                onClick={async () => {
+                  const ok = await sendReset(email);
+                  if (ok) toast.success("Reset email sent again.");
+                }}
+              >
+                <RotateCw className="h-4 w-4" />
+                {cooldown > 0 ? `Resend in ${cooldown}s` : busy ? "Sending…" : "Resend reset email"}
+              </Button>
+
+              <Button asChild variant="hero" size="lg" className="mt-3 w-full">
                 <Link to="/login">
                   Back to login <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -59,28 +106,13 @@ function ForgotPassword() {
                 className="mt-7 space-y-4"
                 onSubmit={async (e) => {
                   e.preventDefault();
-                  const form = e.currentTarget;
-                  const email = (form.elements.namedItem("email") as HTMLInputElement).value;
                   const emailErr = validateEmail(email);
                   if (emailErr) {
                     toast.error(emailErr);
                     return;
                   }
-                  setBusy(true);
-                  try {
-                    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-                      redirectTo: `${window.location.origin}/reset-password`,
-                    });
-                    if (error) {
-                      toast.error("Could not send reset email. Please try again.");
-                      return;
-                    }
-                    setSent(true);
-                  } catch {
-                    toast.error("Something went wrong. Please try again.");
-                  } finally {
-                    setBusy(false);
-                  }
+                  const ok = await sendReset(email);
+                  if (ok) setSent(true);
                 }}
               >
                 <div className="space-y-1.5">
@@ -91,6 +123,8 @@ function ForgotPassword() {
                       id="email"
                       name="email"
                       type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@email.com"
                       className="pl-9"
                       required
