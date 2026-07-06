@@ -205,7 +205,7 @@ function SplashGate() {
         /* ignore */
       }
       setBooting(false);
-    }, 2200);
+    }, 6000);
     return () => clearTimeout(timer);
   }, []);
 

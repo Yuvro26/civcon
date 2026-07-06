@@ -28,9 +28,9 @@ export function SplashScreen() {
             transition={{ duration: 2.4, repeat: Infinity, ease: "linear" }}
           />
 
-          {/* Passport-size photo frame */}
+          {/* Circular photo frame */}
           <motion.div
-            className="relative flex h-36 w-32 items-center justify-center overflow-hidden rounded-2xl border border-border bg-card shadow-lg"
+            className="relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border border-border bg-card shadow-lg"
             animate={{ scale: [1, 1.04, 1] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
