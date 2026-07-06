@@ -167,12 +167,12 @@ html.light {
   --glass-border: oklch(0.72 0.17 62 / 20%);
 }
 
-/* Smooth theme transition */
-html.theme-ready,
-html.theme-ready body,
-html.theme-ready *:not(svg):not(path) {
-  transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease,
-    box-shadow 0.35s ease;
+/* Smooth theme transition — only active briefly while switching themes,
+   so it never taxes scrolling/hover on every element during normal use. */
+html.theme-transition,
+html.theme-transition body,
+html.theme-transition *:not(svg):not(path) {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 /* Completely remove the Lovable branding widget (text + floating X) */
