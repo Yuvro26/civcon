@@ -18,6 +18,9 @@ export const Route = createFileRoute("/register")({
 
 function Register() {
   const navigate = useNavigate();
+  const [password, setPassword] = useState("");
+
+
 
 
   return (
