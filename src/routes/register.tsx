@@ -131,12 +131,16 @@ function Field({
   icon: Icon,
   type = "text",
   placeholder,
+  value,
+  onChange,
 }: {
   id: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   type?: string;
   placeholder?: string;
+  value?: string;
+  onChange?: (value: string) => void;
 }) {
   const isPassword = type === "password";
   const [show, setShow] = useState(false);
@@ -151,8 +155,10 @@ function Field({
           type={inputType}
           placeholder={placeholder}
           className={isPassword ? "pl-9 pr-10" : "pl-9"}
+          {...(onChange ? { value, onChange: (e) => onChange(e.target.value) } : {})}
           required
         />
+
         {isPassword && (
           <button
             type="button"
