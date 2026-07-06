@@ -1,8 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { KeyRound, Lock, Eye, EyeOff, ShieldCheck, ArrowRight } from "lucide-react";
+import { KeyRound, Lock, Eye, EyeOff, ShieldCheck, ArrowRight, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -137,6 +137,15 @@ function AdminAuth() {
             Admin access is restricted to a single secret code. Keep your access code and
             password private — anyone with both can manage all reports.
           </div>
+
+          <div className="mt-4 text-center">
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/login">
+                <ArrowLeft className="h-4 w-4" /> Back to user login
+              </Link>
+            </Button>
+          </div>
+
 
         </motion.div>
       </div>
