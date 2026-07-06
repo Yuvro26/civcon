@@ -91,7 +91,16 @@ function Register() {
             <Field id="name" label="Full Name" icon={User} placeholder="Your name" />
             <Field id="email" label="Email" icon={Mail} type="email" placeholder="you@email.com" />
             <Field id="mobile" label="Mobile Number" icon={Phone} type="tel" placeholder="9876543210" />
-            <Field id="password" label="Password" icon={Lock} type="password" placeholder="••••••••" />
+            <Field
+              id="password"
+              label="Password"
+              icon={Lock}
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={setPassword}
+            />
+            <PasswordStrength value={password} />
             <Field
               id="confirm"
               label="Confirm Password"
