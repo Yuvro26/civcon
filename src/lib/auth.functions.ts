@@ -30,13 +30,22 @@ export const ensureAdminAccount = createServerFn({ method: "POST" }).handler(
     if (created?.user?.id) {
       userId = created.user.id;
     } else if (createErr) {
-      // Already exists — look up the id from the profiles table.
-      const { data: prof } = await supabaseAdmin
-        .from("profiles")
-        .select("id")
-        .eq("email", ADMIN_EMAIL)
-        .maybeSingle();
-      userId = prof?.id;
+      // Already exists — resolve the id directly from the auth system so this
+      // works even when no matching profiles row exists.
+      const { data: list } = await supabaseAdmin.auth.admin.listUsers();
+      userId = list?.users.find(
+        (u) => u.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase(),
+      )?.id;
+
+      // Fallback: profiles table lookup.
+      if (!userId) {
+        const { data: prof } = await supabaseAdmin
+          .from("profiles")
+          .select("id")
+          .eq("email", ADMIN_EMAIL)
+          .maybeSingle();
+        userId = prof?.id;
+      }
     }
 
     if (!userId) return { ready: false };
