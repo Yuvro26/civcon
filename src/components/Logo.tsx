@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import ccLogo from "@/assets/cc-logo.png.asset.json";
+import ccLogo from "@/assets/cc-logo.png";
 
 export function Logo({
   className = "",
@@ -14,7 +14,7 @@ export function Logo({
     <Link to={to} className={`flex items-center gap-2.5 ${className}`}>
       <span className="relative inline-flex h-10 w-10 items-center justify-center">
         <img
-          src={ccLogo.url}
+          src={ccLogo}
           alt="CivicConnect logo"
           className="h-10 w-10 rounded-full object-cover"
         />
