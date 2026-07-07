@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import ccLogo from "@/assets/cc-logo.png.asset.json";
+import ccLogo from "@/assets/cc-logo.png";
 
 export function SplashScreen() {
   return (
@@ -35,7 +35,7 @@ export function SplashScreen() {
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
             <img
-              src={ccLogo.url}
+              src={ccLogo}
               alt="CivicConnect logo"
               className="h-full w-full rounded-full object-cover"
             />
